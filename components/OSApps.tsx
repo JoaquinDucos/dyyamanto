@@ -153,7 +153,7 @@ export const BrowserApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h.01"/><path d="M19.07 4.93L17 9h-4l2.07-4.07A2 2 0 0 1 17 3a2 2 0 0 1 2.07 1.93z"/><path d="M22 13h-4v-2a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2H2"/></svg>
             </button>
             <button className="hover:scale-110 transition-transform">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="4" ry="4"/></svg>
+                <svg width="18" height="18" viewBox="0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="4" ry="4"/></svg>
             </button>
         </div>
     </AppWrapper>
@@ -202,6 +202,160 @@ export const CalendarApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
         </div>
     </AppWrapper>
 );
+
+// --- SETTINGS APP ---
+export const SettingsApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+    <AppWrapper bg="bg-slate-100" onBack={onBack}>
+        <AppHeader title="Settings" onBack={onBack} />
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+             <div className="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-slate-200">
+                 <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-3xl">👤</div>
+                 <div>
+                     <h2 className="font-bold text-lg text-slate-900">CEO User</h2>
+                     <p className="text-slate-500 text-sm">ceo@dyamanto.corp</p>
+                 </div>
+             </div>
+             
+             <div className="space-y-2">
+                 <p className="text-xs font-bold text-slate-500 uppercase ml-2">General</p>
+                 <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
+                     <SettingItem icon="✈️" label="Airplane Mode" toggle />
+                     <SettingItem icon="wifi" label="Wi-Fi" value="Dyamanto_5G" />
+                     <SettingItem icon="bluetooth" label="Bluetooth" value="On" />
+                 </div>
+             </div>
+
+             <div className="space-y-2">
+                 <p className="text-xs font-bold text-slate-500 uppercase ml-2">Display</p>
+                 <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
+                     <SettingItem icon="☀️" label="Brightness" />
+                     <SettingItem icon="Aa" label="Text Size" />
+                 </div>
+             </div>
+        </div>
+    </AppWrapper>
+);
+
+const SettingItem: React.FC<{ icon: string, label: string, value?: string, toggle?: boolean }> = ({ icon, label, value, toggle }) => (
+    <div className="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 active:bg-slate-50">
+        <div className="flex items-center gap-3">
+            <div className={`w-7 h-7 rounded-md flex items-center justify-center text-white text-sm ${icon === 'wifi' ? 'bg-blue-500' : icon === 'bluetooth' ? 'bg-blue-500' : 'bg-orange-500'}`}>
+                {icon === 'wifi' ? '📶' : icon === 'bluetooth' ? 'ᛒ' : icon}
+            </div>
+            <span className="text-sm font-medium text-slate-900">{label}</span>
+        </div>
+        <div className="flex items-center gap-2">
+            {value && <span className="text-sm text-slate-400">{value}</span>}
+            {toggle && <div className="w-10 h-6 bg-slate-200 rounded-full p-1"><div className="w-4 h-4 bg-white rounded-full shadow-sm"></div></div>}
+             {!toggle && <span className="text-slate-300">›</span>}
+        </div>
+    </div>
+);
+
+// --- WEATHER APP ---
+export const WeatherApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+    <AppWrapper bg="bg-gradient-to-b from-sky-400 to-sky-600" onBack={onBack} darkStatus>
+        <AppHeader onBack={onBack} light rightElement={<span className="text-white text-xl">≡</span>} />
+        <div className="flex-1 flex flex-col items-center pt-8 text-white px-6">
+            <h2 className="text-3xl font-light">Buenos Aires</h2>
+            <p className="text-sm font-medium opacity-90">Partly Cloudy</p>
+            <h1 className="text-9xl font-thin mt-2 ml-4">24°</h1>
+            
+            <div className="flex gap-8 mt-4 text-sm font-medium">
+                <span>H:28°</span>
+                <span>L:18°</span>
+            </div>
+
+            <div className="w-full bg-white/20 backdrop-blur-md rounded-3xl mt-12 p-4 border border-white/10">
+                <p className="text-xs uppercase font-bold opacity-70 mb-4 border-b border-white/10 pb-2">Hourly Forecast</p>
+                <div className="flex justify-between">
+                    <WeatherHour time="Now" icon="☀️" temp="24°" />
+                    <WeatherHour time="15" icon="⛅" temp="25°" />
+                    <WeatherHour time="16" icon="☁️" temp="24°" />
+                    <WeatherHour time="17" icon="☁️" temp="23°" />
+                    <WeatherHour time="18" icon="🌙" temp="21°" />
+                </div>
+            </div>
+        </div>
+    </AppWrapper>
+);
+
+const WeatherHour = ({ time, icon, temp }: any) => (
+    <div className="flex flex-col items-center gap-2">
+        <span className="text-xs font-bold">{time}</span>
+        <span className="text-xl">{icon}</span>
+        <span className="text-sm font-bold">{temp}</span>
+    </div>
+);
+
+// --- MUSIC APP ---
+export const MusicApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+    <AppWrapper bg="bg-gradient-to-b from-rose-900 to-black" onBack={onBack} darkStatus>
+        <AppHeader onBack={onBack} title="Music" light color="text-rose-500" />
+        <div className="flex-1 flex flex-col p-8">
+            <div className="aspect-square bg-slate-800 rounded-2xl shadow-2xl mb-8 overflow-hidden relative group">
+                <img src="https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=2070" className="w-full h-full object-cover opacity-80" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                     <span className="text-6xl filter drop-shadow-lg">🎵</span>
+                </div>
+            </div>
+            
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold text-white mb-1">Focus Flow</h2>
+                <p className="text-rose-400 font-medium">Dyamanto Beats</p>
+            </div>
+
+            <div className="w-full bg-white/10 h-1 rounded-full mb-2 overflow-hidden">
+                <div className="w-1/3 h-full bg-white/50"></div>
+            </div>
+            <div className="flex justify-between text-xs text-slate-400 font-medium font-mono mb-8">
+                <span>1:23</span>
+                <span>-3:45</span>
+            </div>
+
+            <div className="flex justify-between items-center px-4">
+                <button className="text-3xl text-white/50 hover:text-white">⏮</button>
+                <button className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl shadow-lg hover:scale-105 active:scale-95 transition-transform text-black pl-1">▶</button>
+                <button className="text-3xl text-white/50 hover:text-white">⏭</button>
+            </div>
+        </div>
+    </AppWrapper>
+);
+
+// --- CLOCK APP ---
+export const ClockApp: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+    const [time, setTime] = useState(new Date());
+
+    useEffect(() => {
+        const t = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(t);
+    }, []);
+
+    return (
+        <AppWrapper bg="bg-black" onBack={onBack} darkStatus>
+            <AppHeader onBack={onBack} title="Clock" light color="text-orange-500" />
+            <div className="flex-1 flex flex-col items-center justify-center">
+                 <div className="text-7xl font-thin text-white tabular-nums tracking-tighter">
+                     {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                 </div>
+                 <div className="text-xl text-slate-500 font-medium mt-2">
+                     {time.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+                 </div>
+            </div>
+            <div className="px-4 pb-20 w-full">
+                 <div className="flex justify-between items-center py-4 border-b border-white/10">
+                     <div>
+                         <span className="text-3xl text-slate-400 font-light">08:00</span>
+                         <p className="text-xs text-slate-500">Alarm</p>
+                     </div>
+                     <div className="w-12 h-7 bg-green-500 rounded-full relative">
+                         <div className="absolute right-0.5 top-0.5 w-6 h-6 bg-white rounded-full shadow-sm"></div>
+                     </div>
+                 </div>
+            </div>
+        </AppWrapper>
+    );
+}
 
 // --- AWARDS APP (NEW) ---
 export const BADGES = {
@@ -267,6 +421,35 @@ export const BADGES = {
         desc: 'Demostraste un liderazgo sólido y predecible.', 
         criteria: 'Mantén una racha positiva (Streak) mayor a 4.',
         rarity: 'Épico' 
+    },
+    // NEW BADGES
+    'GAMER': {
+        title: 'The Gamer',
+        icon: '🎮',
+        desc: 'Priorizaste el bienestar del equipo con una partida de Valorant.',
+        criteria: 'En Leaks, acepta jugar videojuegos con el equipo.',
+        rarity: 'Raro'
+    },
+    'WHISTLEBLOWER': {
+        title: 'Double Agent',
+        icon: '🕵️',
+        desc: 'Filtraste información sensible para desviar la atención.',
+        criteria: 'En Leaks, decide filtrar los sueldos.',
+        rarity: 'Raro'
+    },
+    'IRON_FIST': {
+        title: 'Iron Fist',
+        icon: '👊',
+        desc: 'Impulsaste la autoridad por sobre la empatía.',
+        criteria: 'En Leaks, sé autoritario con Javi.',
+        rarity: 'Común'
+    },
+    'DIPLOMAT': {
+        title: 'Diplomat',
+        icon: '🤝',
+        desc: 'Resolviste una crisis de liderazgo sin despedir a nadie.',
+        criteria: 'En Leaks, logra que Javi se quede y admita su error.',
+        rarity: 'Épico'
     }
 };
 
@@ -284,20 +467,24 @@ export const AwardsApp: React.FC<{ onBack: () => void, unlockedBadges: string[] 
                  <p className="text-slate-400 text-xs">Toca una medalla para ver cómo ganarla.</p>
             </div>
             
-            <div className="flex-1 overflow-y-auto px-4 pb-20 grid grid-cols-2 gap-4">
+            {/* IMPROVED GRID: auto-rows-fr prevents overlapping */}
+            <div className="flex-1 overflow-y-auto px-4 pb-20 grid grid-cols-2 gap-4 content-start">
                 {Object.entries(BADGES).map(([id, badge]) => {
                     const unlocked = unlockedBadges.includes(id);
                     return (
                         <button 
                             key={id} 
                             onClick={() => setSelectedBadge(id)}
-                            className={`aspect-square rounded-3xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden border transition-all active:scale-95 ${unlocked ? 'bg-slate-800 border-yellow-500/30 shadow-lg shadow-yellow-900/20' : 'bg-slate-800/50 border-white/5 opacity-60 hover:opacity-80'}`}
+                            className={`
+                                rounded-3xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden border transition-all active:scale-95 min-h-[140px]
+                                ${unlocked ? 'bg-slate-800 border-yellow-500/30 shadow-lg shadow-yellow-900/20' : 'bg-slate-800/50 border-white/5 opacity-60 hover:opacity-80'}
+                            `}
                         >
                             {unlocked && <div className="absolute inset-0 bg-gradient-to-tr from-yellow-500/10 to-transparent pointer-events-none"></div>}
                             <div className={`text-4xl mb-3 transition-transform duration-500 ${unlocked ? 'scale-110 filter drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]' : 'grayscale blur-[1px]'}`}>
                                 {badge.icon}
                             </div>
-                            <h3 className={`font-bold text-sm mb-1 ${unlocked ? 'text-white' : 'text-slate-500'}`}>{badge.title}</h3>
+                            <h3 className={`font-bold text-sm mb-1 leading-tight ${unlocked ? 'text-white' : 'text-slate-500'}`}>{badge.title}</h3>
                             {unlocked ? (
                                 <span className="text-[9px] font-bold text-green-400 uppercase tracking-wider">Desbloqueado</span>
                             ) : (
@@ -352,230 +539,61 @@ export const AwardsApp: React.FC<{ onBack: () => void, unlockedBadges: string[] 
     );
 };
 
-// --- PHOTOS APP ---
-export const PhotosApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-    <AppWrapper bg="bg-white" onBack={onBack}>
-        <AppHeader title="Recents" onBack={onBack} />
-        <div className="grid grid-cols-3 gap-0.5 px-0.5 pb-20 overflow-y-auto">
-            {[
-                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500', 
-                'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500', 
-                'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500', 
-                'https://images.unsplash.com/photo-1593642632823-8f78536788c6?w=500', 
-                'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=500', 
-                'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500', 
-                'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=500', 
-                'https://images.unsplash.com/photo-1551434678-e076c223a692?w=500', 
-                'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500' 
-            ].map((url, i) => (
-                <div key={i} className="aspect-square bg-slate-100 overflow-hidden relative group cursor-pointer">
-                    <img src={url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Gallery" />
-                </div>
-            ))}
-        </div>
-    </AppWrapper>
-);
-
-// --- WEATHER APP ---
-export const WeatherApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-    <AppWrapper bg="bg-gradient-to-b from-blue-400 to-blue-600" onBack={onBack} darkStatus>
-        <AppHeader onBack={onBack} light />
-        
-        <div className="flex flex-col items-center pt-8 text-white p-6 text-center animate-slide-up">
-            <h2 className="text-2xl font-medium tracking-wide">Dyamanto HQ</h2>
-            <h1 className="text-9xl font-thin mt-2 mb-4 tracking-tighter">22°</h1>
-            <p className="text-lg font-medium opacity-90">Organizational Climate: Sunny</p>
-            <div className="flex gap-3 mt-2 text-base font-medium opacity-80">
-                <span>H:28°</span>
-                <span>L:15°</span>
-            </div>
-            
-            <div className="mt-12 w-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-lg">
-                <div className="text-xs font-bold uppercase opacity-70 mb-4 border-b border-white/10 pb-3 text-left flex items-center gap-2">
-                    <span className="text-lg">📅</span> Forecast
-                </div>
-                <div className="flex justify-between">
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-bold opacity-80">NOW</span>
-                        <span className="text-2xl my-2 drop-shadow-md">☀️</span>
-                        <span className="text-[10px] font-bold uppercase opacity-70">High Morale</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-bold opacity-80">14PM</span>
-                        <span className="text-2xl my-2 drop-shadow-md">🌩️</span>
-                        <span className="text-[10px] font-bold uppercase opacity-70">Deadline</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-bold opacity-80">16PM</span>
-                        <span className="text-2xl my-2 drop-shadow-md">⛅</span>
-                        <span className="text-[10px] font-bold uppercase opacity-70">Retro</span>
-                    </div>
-                     <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-bold opacity-80">18PM</span>
-                        <span className="text-2xl my-2 drop-shadow-md">🍻</span>
-                        <span className="text-[10px] font-bold uppercase opacity-70">Beer</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </AppWrapper>
-);
-
-// --- MUSIC APP ---
-export const MusicApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-    <AppWrapper bg="bg-gradient-to-b from-slate-900 to-black" onBack={onBack} darkStatus>
-        <AppHeader onBack={onBack} light color="text-pink-500" />
-        <div className="p-8 flex flex-col h-full text-white pb-20">
-            <div className="w-full aspect-square bg-slate-800 rounded-2xl shadow-2xl mb-10 overflow-hidden relative group mx-auto max-w-sm border border-white/10">
-                <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=800" className="w-full h-full object-cover opacity-80" alt="Album" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center pl-2 text-4xl shadow-lg ring-1 ring-white/50 cursor-pointer hover:scale-110 transition-transform active:scale-95">▶</div>
-                </div>
-            </div>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2 tracking-tight">Deep Work Flow</h1>
-                <p className="text-pink-400 font-medium text-lg">Dyamanto Beats</p>
-            </div>
-            {/* Progress */}
-            <div className="w-full h-1.5 bg-slate-800 rounded-full mb-2 cursor-pointer group">
-                <div className="w-1/3 h-full bg-white rounded-full group-hover:bg-pink-500 transition-colors relative">
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform"></div>
-                </div>
-            </div>
-            <div className="flex justify-between text-xs text-slate-500 font-bold mb-10">
-                <span>1:23</span>
-                <span>-3:45</span>
-            </div>
-            {/* Controls */}
-            <div className="flex justify-between items-center px-6">
-                 <button className="text-4xl text-white/50 hover:text-white transition-colors">⏮</button>
-                 <button className="text-7xl text-white hover:scale-105 transition-transform active:scale-95">⏸</button>
-                 <button className="text-4xl text-white/50 hover:text-white transition-colors">⏭</button>
-            </div>
-        </div>
-    </AppWrapper>
-);
-
-// --- CLOCK APP ---
-export const ClockApp: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-    const [time, setTime] = useState(new Date());
-    useEffect(() => {
-        const t = setInterval(() => setTime(new Date()), 1000);
-        return () => clearInterval(t);
-    }, []);
-
-    return (
-        <AppWrapper bg="bg-black" onBack={onBack} darkStatus>
-             <AppHeader onBack={onBack} light color="text-orange-500" title="World Clock" />
-             <div className="p-4 pt-4">
-                 <h1 className="text-3xl font-bold text-white mb-6 px-2">World Clock</h1>
-                 <div className="space-y-0">
-                     <div className="flex justify-between items-baseline border-b border-white/10 py-4 px-2 hover:bg-white/5 transition-colors">
-                         <div>
-                             <p className="text-slate-400 text-xs font-medium">Today, +0HRS</p>
-                             <p className="text-2xl text-white font-light">Buenos Aires</p>
-                         </div>
-                         <div className="text-5xl text-white font-thin tracking-wider">
-                             {time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                         </div>
-                     </div>
-                     <div className="flex justify-between items-baseline border-b border-white/10 py-4 px-2 hover:bg-white/5 transition-colors opacity-60">
-                         <div>
-                             <p className="text-slate-400 text-xs font-medium">Today, -3HRS</p>
-                             <p className="text-2xl text-white font-light">Mexico City</p>
-                         </div>
-                         <div className="text-5xl text-white font-thin tracking-wider">
-                             {new Date(time.getTime() - 3*60*60*1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                         </div>
-                     </div>
-                     <div className="flex justify-between items-baseline border-b border-white/10 py-4 px-2 hover:bg-white/5 transition-colors opacity-60">
-                         <div>
-                             <p className="text-slate-400 text-xs font-medium">Tomorrow, +12HRS</p>
-                             <p className="text-2xl text-white font-light">Tokyo</p>
-                         </div>
-                         <div className="text-5xl text-white font-thin tracking-wider">
-                             {new Date(time.getTime() + 12*60*60*1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                         </div>
-                     </div>
-                 </div>
-             </div>
-        </AppWrapper>
-    );
-};
-
-// --- SETTINGS APP ---
-export const SettingsApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-    <AppWrapper bg="bg-[#F2F2F7]" onBack={onBack}>
-        <AppHeader onBack={onBack} title="Settings" />
-        <div className="px-4 pb-2">
-             <h1 className="text-3xl font-bold text-black mb-4">Settings</h1>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 pb-12">
-            <div className="bg-white rounded-xl p-4 flex items-center gap-4 mb-6 shadow-sm border border-slate-200/60">
-                <div className="w-16 h-16 rounded-full bg-slate-200 overflow-hidden border border-slate-100">
-                    <img src="https://ui-avatars.com/api/?name=CEO+Manager&background=random" className="w-full h-full" alt="User" />
-                </div>
-                <div>
-                    <h2 className="text-xl font-medium text-slate-900">YO (Dyamanto User)</h2>
-                    <p className="text-xs text-slate-500">Apple ID, iCloud+, Media & Purchases</p>
-                </div>
-            </div>
-            <div className="bg-white rounded-xl overflow-hidden mb-6 shadow-sm border border-slate-200/60">
-                <MenuItem icon="✈️" color="bg-orange-500" label="Airplane Mode" toggle />
-                <MenuItem icon="W" color="bg-blue-500" label="Wi-Fi" value="Dyamanto_5G" />
-                <MenuItem icon="B" color="bg-blue-600" label="Bluetooth" value="On" />
-            </div>
-            <h3 className="text-xs font-bold text-slate-500 uppercase ml-4 mb-2">About This Experience</h3>
-            <div className="bg-white rounded-xl overflow-hidden mb-6 shadow-sm border border-slate-200/60">
-                 <div className="p-4 border-b border-slate-100 flex justify-between items-center">
-                    <span className="text-sm font-medium">Assignment</span>
-                    <span className="text-sm text-slate-500">Comportamiento Org.</span>
-                 </div>
-                 <div className="p-4 border-b border-slate-100">
-                    <span className="text-sm font-medium block mb-2">Credits</span>
-                    <div className="text-xs text-slate-500 grid grid-cols-1 gap-1">
-                        <p>Branca, Belén</p>
-                        <p>Ducos, Joaquín</p>
-                        <p>Martínez P, Gonzalo</p>
-                        <p>Varela V, Santiago</p>
-                        <p>Yennaccaro, Francisco</p>
-                    </div>
-                 </div>
-                 <div className="p-4 flex justify-between items-center">
-                    <span className="text-sm font-medium">Version</span>
-                    <span className="text-sm text-slate-500">DyamantoOS 2.0.1</span>
-                 </div>
-            </div>
-        </div>
-    </AppWrapper>
-);
-
-const MenuItem: React.FC<{ icon: string, color: string, label: string, value?: string, toggle?: boolean }> = ({ icon, color, label, value, toggle }) => (
-    <div className="flex items-center p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors cursor-pointer active:bg-slate-100">
-        <div className={`w-7 h-7 rounded-md ${color} flex items-center justify-center text-white text-xs mr-3`}>{icon}</div>
-        <div className="flex-1 flex justify-between items-center">
-            <span className="text-sm font-medium text-slate-900">{label}</span>
-            {value && <span className="text-sm text-slate-400 flex items-center gap-1">{value} <span className="text-xs">❯</span></span>}
-            {toggle && <div className="w-10 h-6 bg-slate-200 rounded-full relative"><div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></div></div>}
-        </div>
-    </div>
-);
-
 // --- PHONE APP ---
-export const PhoneApp: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-    const [calling, setCalling] = useState<string | null>(null);
+export const PhoneApp: React.FC<{ onBack: () => void, initialIncomingCall?: string | null }> = ({ onBack, initialIncomingCall }) => {
+    const [calling, setCalling] = useState<string | null>(initialIncomingCall || null);
+    
+    // Auto answer simulation if incoming call is active
+    const [incomingState, setIncomingState] = useState<'ringing' | 'connected' | 'ended'>(initialIncomingCall ? 'ringing' : 'ended');
+
+    useEffect(() => {
+        if (initialIncomingCall) {
+            setCalling(initialIncomingCall);
+            setIncomingState('ringing');
+        }
+    }, [initialIncomingCall]);
+
+    const handleAcceptCall = () => {
+        setIncomingState('connected');
+        setTimeout(() => {
+            // Fake conversation end
+            setIncomingState('ended');
+            setCalling(null);
+        }, 3000);
+    };
+
+    const handleDeclineCall = () => {
+        setIncomingState('ended');
+        setCalling(null);
+    };
+
     return (
         <AppWrapper bg="bg-white" onBack={onBack}>
             {calling ? (
                 <div className="flex-1 bg-slate-900 flex flex-col items-center justify-between py-16 text-white relative overflow-hidden h-full z-40">
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070')] opacity-20 blur-xl bg-cover"></div>
+                    {/* Background Animation for Ringing */}
+                    <div className={`absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070')] opacity-20 blur-xl bg-cover ${incomingState === 'ringing' ? 'animate-pulse' : ''}`}></div>
+                    
                     <div className="z-10 text-center mt-10">
-                        <div className="w-24 h-24 bg-slate-700 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl animate-pulse">👤</div>
+                        <div className="w-24 h-24 bg-slate-700 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl animate-pulse">
+                            {incomingState === 'connected' ? '🔊' : '👤'}
+                        </div>
                         <h2 className="text-3xl font-thin mb-1">{calling}</h2>
-                        <p className="text-sm opacity-70 animate-pulse">calling mobile...</p>
+                        <p className="text-sm opacity-70 animate-pulse">
+                            {incomingState === 'ringing' ? 'Incoming Video Call...' : incomingState === 'connected' ? '00:03' : 'Ending...'}
+                        </p>
+                        {incomingState === 'connected' && <p className="text-xs text-red-400 mt-2 font-bold">¡ESTÁS DESPEDIDO!</p>}
                     </div>
-                    <div className="w-full px-12 z-10 mb-8 flex justify-center">
-                         <button onClick={() => setCalling(null)} className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-red-600 active:scale-95 transition-all">📞</button>
+
+                    <div className="w-full px-12 z-10 mb-8 flex justify-around items-center">
+                         {incomingState === 'ringing' ? (
+                            <>
+                                <button onClick={handleDeclineCall} className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-red-600 active:scale-95 transition-all">✖</button>
+                                <button onClick={handleAcceptCall} className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 active:scale-95 transition-all animate-bounce">📞</button>
+                            </>
+                         ) : (
+                             <button onClick={() => setCalling(null)} className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-red-600 active:scale-95 transition-all">📞</button>
+                         )}
                     </div>
                 </div>
             ) : (
@@ -583,10 +601,10 @@ export const PhoneApp: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <AppHeader onBack={onBack} title="Contacts" rightElement={<button className="text-blue-500 text-2xl leading-none font-light">+</button>} />
                     <div className="flex-1 overflow-y-auto px-4">
                         <div className="space-y-1 mt-2">
-                             <ContactItem name="Davide (CEO)" role="The Boss" onClick={() => setCalling("Davide (CEO)")} />
-                             <ContactItem name="Javi (Tech Lead)" role="Rebel Leader" onClick={() => setCalling("Javi")} />
-                             <ContactItem name="Ana (Senior)" role="Peacemaker" onClick={() => setCalling("Ana")} />
-                             <ContactItem name="Sofia (PO)" role="Bureaucrat" onClick={() => setCalling("Sofia")} />
+                             <ContactItem name="Davide (CEO)" role="The Boss" onClick={() => { setCalling("Davide (CEO)"); setIncomingState('ringing'); }} />
+                             <ContactItem name="Javi (Tech Lead)" role="Rebel Leader" onClick={() => { setCalling("Javi"); setIncomingState('ringing'); }} />
+                             <ContactItem name="Ana (Senior)" role="Peacemaker" onClick={() => { setCalling("Ana"); setIncomingState('ringing'); }} />
+                             <ContactItem name="Sofia (PO)" role="Bureaucrat" onClick={() => { setCalling("Sofia"); setIncomingState('ringing'); }} />
                         </div>
                     </div>
                     {/* Fake Tab Bar */}

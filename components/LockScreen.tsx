@@ -43,7 +43,7 @@ const LockScreen: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
                       <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center text-xl shrink-0 shadow-sm">💬</div>
                       <div className="min-w-0">
                           <div className="flex justify-between items-baseline">
-                               <h4 className="text-sm font-bold text-white">Leaks</h4>
+                               <h4 className="text-sm font-bold text-white">Whatsapp</h4>
                                <span className="text-[10px] text-white/60">2m ago</span>
                           </div>
                           <p className="text-xs text-white/90 truncate">Javi: "Che, vieron el mail de RRHH? 😡"</p>

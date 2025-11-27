@@ -17,6 +17,9 @@ const App: React.FC = () => {
   const [morale, setMorale] = useState(90);
   const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
   
+  // INTER-APP STATE
+  const [incomingCall, setIncomingCall] = useState<string | null>(null);
+  
   // NOTIFICATION STATE
   const [notification, setNotification] = useState<{title: string, icon: string, color: string} | null>(null);
 
@@ -29,6 +32,7 @@ const App: React.FC = () => {
 
   const navigateTo = (view: string) => {
     setCurrentView(view);
+    if (view !== 'phone') setIncomingCall(null); // Reset call if leaving phone
   };
 
   const unlockBadge = (id: string) => {
@@ -51,6 +55,14 @@ const App: React.FC = () => {
       }
   };
 
+  // Trigger a fake call from another app
+  const triggerIncomingCall = (callerName: string) => {
+      setIncomingCall(callerName);
+      setTimeout(() => {
+          setCurrentView('phone');
+      }, 1500); // Small delay to let the user realize what's happening
+  };
+
   // Helper function to render the current app view (not a component definition)
   const renderCurrentView = () => {
     switch (currentView) {
@@ -68,7 +80,13 @@ const App: React.FC = () => {
                 />
             );
         case 'leaks':
-            return <Leaks onBack={() => navigateTo('landing')} />;
+            return (
+                <Leaks 
+                    onBack={() => navigateTo('landing')} 
+                    unlockBadge={unlockBadge}
+                    onTriggerCall={triggerIncomingCall}
+                />
+            );
         case 'dashboard':
             return <Dashboard onBack={() => navigateTo('landing')} />;
         case 'mail':
@@ -78,7 +96,7 @@ const App: React.FC = () => {
         case 'settings':
             return <SettingsApp onBack={() => navigateTo('landing')} />;
         case 'phone':
-            return <PhoneApp onBack={() => navigateTo('landing')} />;
+            return <PhoneApp onBack={() => navigateTo('landing')} initialIncomingCall={incomingCall} />;
         case 'calendar':
             return <CalendarApp onBack={() => navigateTo('landing')} />;
         case 'awards':

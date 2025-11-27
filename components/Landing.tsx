@@ -51,7 +51,7 @@ const Landing: React.FC<LandingProps> = ({ onNavigate, stability, morale }) => {
         {/* APPS GRID */}
         <div className="grid grid-cols-4 gap-x-4 gap-y-8">
             <AppIcon icon="🏗️" label="Simulator" gradient="bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600" onClick={() => onNavigate('simulator')} />
-            <AppIcon icon="💬" label="Leaks" gradient="bg-gradient-to-br from-green-400 to-emerald-600" badge={3} onClick={() => onNavigate('leaks')} />
+            <AppIcon icon="💬" label="Whatsapp" gradient="bg-gradient-to-br from-green-400 to-emerald-600" badge={3} onClick={() => onNavigate('leaks')} />
             <AppIcon icon="📊" label="Data Lab" gradient="bg-gradient-to-br from-blue-400 to-cyan-600" onClick={() => onNavigate('dashboard')} />
             <AppIcon icon="⚙️" label="Settings" gradient="bg-gradient-to-br from-slate-500 to-slate-700" onClick={() => onNavigate('settings')} />
             

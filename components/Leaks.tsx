@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { ChatNode, Message } from '../types';
 import MessageBubble from './MessageBubble';
@@ -7,7 +6,7 @@ import ChatHeader from './ChatHeader';
 // Assets
 const SAPEEE_IMG_URL = "https://preview.redd.it/z3nj57t6grm61.jpg?auto=webp&s=9eecb9cefdd01cd2be90c4cdc5653e300d27d37f";
 const HOMER_GIF_URL = "https://media.giphy.com/media/COYGe9rZvfiaQ/giphy.gif"; 
-const FIST_BUMP_URL = "https://media.giphy.com/media/Ke3CM1NVkULWo/giphy.gif"; // Reliable GIF URL
+const FIST_BUMP_URL = "https://media.giphy.com/media/Ke3CM1NVkULWo/giphy.gif"; 
 const VALORANT_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4eGp2c3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4/3o7527pa7qs9kCG78A/giphy.gif";
 
 // Story Data
@@ -75,6 +74,7 @@ const STORY_NODES: Record<string, ChatNode> = {
     id: 'authoritarian',
     messages: [
       { id: 'a1', role: 'hero', sender: 'Tú', text: 'Equipo, son normas de la empresa. Por favor, acaten y sigan trabajando.', delay: 500 },
+      { id: 'sys_hack', role: 'system', sender: 'System', text: '⚠️ Javi cambió el nombre del grupo a "Corporate Slaves"', delay: 1200 },
       { id: 'a2', role: 'dev', sender: 'Javi', text: 'Ah, listo. "Acaten". Pensé que éramos socios.', delay: 1500, triggerReaction: { targetId: 'a1', emoji: '👎' } },
       { id: 'a3', role: 'dev', sender: 'Ana', text: 'Qué decepción.', delay: 2500 },
       { id: 'sys_leave', role: 'system', sender: 'System', text: '🚪 Javi ha abandonado el grupo.', delay: 3500 }
@@ -89,7 +89,8 @@ const STORY_NODES: Record<string, ChatNode> = {
       messages: [
           { id: 'r1', role: 'hero', sender: 'Tú', text: '(Llamada) Javi, volvé. Me equivoqué con el tono.', delay: 500 },
           { id: 'r2', role: 'system', sender: 'System', text: 'Javi se unió al grupo.', delay: 1500 },
-          { id: 'r3', role: 'dev', sender: 'Javi', text: 'Vuelvo por el equipo. Pero el clima está roto.', delay: 2500 }
+          { id: 'r3', role: 'dev', sender: 'Javi', text: 'Vuelvo por el equipo. Pero el clima está roto.', delay: 2500 },
+           { id: 'sys_rename', role: 'system', sender: 'System', text: 'Ana cambió el nombre del grupo a "Dyamanto Devs"', delay: 3000 }
       ],
       autoNext: 'work_mode_tense'
   },
@@ -111,6 +112,7 @@ const STORY_NODES: Record<string, ChatNode> = {
       id: 'gaming_accepted',
       messages: [
           { id: 'ga1', role: 'hero', sender: 'Tú', text: 'Sale. Pasen Discord. Pero si perdemos, codear el doble.', delay: 500 },
+          { id: 'sys_game', role: 'system', sender: 'System', text: '🎮 ESTADO: JUGANDO VALORANT - NO MOLESTAR', delay: 1000 },
           { id: 'ga2', role: 'dev', sender: 'Javi', type: 'sticker', contentUrl: VALORANT_GIF, delay: 1500 },
           { id: 'ga3', role: 'system', sender: 'System', text: '⏳ 45 minutos después...', delay: 3000 }
       ],
@@ -215,12 +217,12 @@ const STORY_NODES: Record<string, ChatNode> = {
   },
   'fired_ending': {
       id: 'fired_ending',
-      messages: [{ id: 'fe1', role: 'system', sender: 'System', text: 'Crisis total.', delay: 500 }],
+      messages: [{ id: 'fe1', role: 'system', sender: 'System', text: 'Llamada entrante...', delay: 500 }],
       autoNext: 'lose_fired'
   }
 };
 
-const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, onTriggerCall: (name: string) => void }> = ({ onBack, unlockBadge, onTriggerCall }) => {
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -231,10 +233,35 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [activeReactionId, setActiveReactionId] = useState<string | null>(null);
+  
+  // Game State inside Chat
+  const [stressLevel, setStressLevel] = useState(20);
+  const [groupName, setGroupName] = useState("Dyamanto Devs 💎");
 
   useEffect(() => {
     const node = STORY_NODES[currentNodeId];
     if (!node) return;
+
+    // --- LOGRO & EVENT TRIGGERS ---
+    if (currentNodeId === 'gaming_accepted') unlockBadge('GAMER');
+    if (currentNodeId === 'leak_salary') unlockBadge('WHISTLEBLOWER');
+    if (currentNodeId === 'authoritarian') {
+        unlockBadge('IRON_FIST');
+        setGroupName("Corporate Slaves ⛓️");
+        setStressLevel(90);
+    }
+    if (currentNodeId === 'redemption') {
+        unlockBadge('DIPLOMAT');
+        setStressLevel(50);
+        setTimeout(() => setGroupName("Dyamanto Devs 💎"), 3000);
+    }
+    
+    // --- PHONE CALL TRIGGER ---
+    if (currentNodeId === 'lose_fired') {
+        setTimeout(() => {
+            onTriggerCall('Davide (CEO)');
+        }, 2000);
+    }
 
     let timeouts: ReturnType<typeof setTimeout>[] = [];
     let accumulatedDelay = 0;
@@ -321,12 +348,26 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       
       {/* 1. Header (Sticky & Safe Area) */}
       <ChatHeader 
-        title="Dyamanto Devs 💎"
+        title={groupName}
         subtitle={isTyping ? `${typingSender} está escribiendo...` : "Toca para info"}
         avatarUrl="https://ui-avatars.com/api/?name=Dyamanto+Devs&background=25D366&color=fff"
         onBack={onBack}
         onInfo={() => setShowGroupInfo(true)}
       />
+      
+      {/* Team Stress Meter (Gamification Element) */}
+      <div className="absolute top-[calc(env(safe-area-inset-top)+60px)] right-2 z-20 w-32 bg-white/80 backdrop-blur-sm rounded-lg p-1.5 border border-white/50 shadow-sm flex flex-col gap-1">
+          <div className="flex justify-between text-[8px] font-black uppercase text-slate-500">
+              <span>Team Stress</span>
+              <span className={stressLevel > 70 ? 'text-red-500' : 'text-green-500'}>{stressLevel}%</span>
+          </div>
+          <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-1000 ${stressLevel > 70 ? 'bg-red-500 animate-pulse' : stressLevel > 40 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                style={{ width: `${stressLevel}%` }}
+              ></div>
+          </div>
+      </div>
 
       {/* 2. Group Info Modal (Overlay) */}
       {showGroupInfo && (
@@ -334,7 +375,7 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <div className="w-full sm:w-4/5 h-full bg-[#F0F2F5] shadow-2xl animate-slide-right flex flex-col pt-safe" onClick={e => e.stopPropagation()}>
                   <div className="bg-white p-6 flex flex-col items-center border-b border-slate-200 mt-8 sm:mt-0">
                       <div className="w-24 h-24 rounded-full bg-green-500 mb-4 flex items-center justify-center text-4xl shadow-lg ring-4 ring-green-100">💎</div>
-                      <h2 className="text-xl font-black text-slate-800">Dyamanto Devs</h2>
+                      <h2 className="text-xl font-black text-slate-800">{groupName}</h2>
                       <p className="text-slate-500 text-xs mt-1 font-medium">Grupo · 12 participantes</p>
                   </div>
                   <div className="p-4 space-y-4 overflow-y-auto flex-1">
