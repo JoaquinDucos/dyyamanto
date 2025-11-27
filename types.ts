@@ -35,6 +35,7 @@ export interface Level {
     moraleImpact: number; // New metric
     feedback: string;
     theory: string;
+    theoryWhy?: string;
   }[];
   hint?: string; // Advisor hint
 }

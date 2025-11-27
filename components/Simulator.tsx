@@ -2,295 +2,328 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameState, Level } from '../types';
 import JengaBlock from './JengaBlock';
+import SimulatorHUD from './SimulatorHUD';
+import SimulatorCard from './SimulatorCard';
 
+// Updated data structure with detailed theoretical explanations
 const GAME_LEVELS: Level[] = [
   {
     id: 1,
     title: "El Dilema de los KPIs",
-    description: "El directorio de Dyamanto exige 'eficiencia' inmediata. El equipo de desarrollo amenaza con rebelarse si se imponen métricas absurdas.",
+    description: "El directorio exige 'eficiencia' inmediata. El equipo de desarrollo amenaza con rebelarse si se imponen métricas absurdas como líneas de código.",
     hint: "La cultura de Dyamanto se basa en la confianza, no en el control.",
     options: [
-      {
-        text: "Imponer métricas duras (Líneas de código/día).",
-        stabilityImpact: -40,
-        moraleImpact: -50,
-        feedback: "💥 Error Crítico. El equipo siente que violaste la 'Confianza'. La productividad bajó por rebelión.",
-        theory: "Teoría de Lewin: Aumentaste la presión sin descongelar la cultura."
+      { 
+        text: "Imponer métricas duras (Líneas de código/día).", 
+        stabilityImpact: -40, 
+        moraleImpact: -50, 
+        feedback: "💥 Error Crítico. El equipo siente que violaste la 'Confianza'. La productividad bajó por rebelión.", 
+        theory: "Teoría de Cambio (Lewin)",
+        theoryWhy: "Impusiste una fase de 'Cambio' agresiva sin antes 'Descongelar' las creencias del grupo. Al aumentar la fuerza coercitiva, solo generaste una fuerza de resistencia igual u opuesta."
       },
-      {
-        text: "Negociar: 'Métricas de Salud' definidas por el equipo.",
-        stabilityImpact: 10,
-        moraleImpact: 20,
-        feedback: "✅ Éxito. Convertiste el control en un ejercicio de transparencia compartida.",
-        theory: "Participación: Reduce la resistencia al cambio."
+      { 
+        text: "Negociar: 'Métricas de Salud' definidas por el equipo.", 
+        stabilityImpact: 10, 
+        moraleImpact: 20, 
+        feedback: "✅ Éxito. Convertiste el control en un ejercicio de transparencia compartida.", 
+        theory: "Gestión Participativa",
+        theoryWhy: "Al involucrar a los empleados en el diseño del control (Justicia Procedimental), reduces la resistencia al cambio y alineas los objetivos personales con los de la organización."
       },
-      {
-        text: "Ignorar al directorio y proteger al equipo (Delay).",
-        stabilityImpact: -10,
-        moraleImpact: 10,
-        feedback: "⏳ Temporal. El equipo está feliz, pero los inversores sospechan. Ganaste tiempo.",
-        theory: "Gestión de Stakeholders: A veces hay que comprar paz social."
+      { 
+        text: "Ignorarlo y proteger al equipo.", 
+        stabilityImpact: -10, 
+        moraleImpact: 10, 
+        feedback: "⏳ Temporal. El equipo está feliz, pero los inversores sospechan.", 
+        theory: "Gestión de Límites (Boundary Spanning)",
+        theoryWhy: "Actuaste como escudo, lo cual protege la moral a corto plazo, pero al aislar al equipo de la realidad externa (el directorio), arriesgas la viabilidad sistémica de la empresa."
       }
     ]
   },
   {
     id: 2,
     title: "La Vuelta a la Oficina",
-    description: "Se vence el alquiler de la oficina vieja. Hay opción de renovar por mucho dinero o pasar a 'Full Remote'.",
-    hint: "El espacio físico no define la cultura.",
+    description: "Se vence el alquiler de la oficina. Hay opción de renovar o pasar a 'Full Remote'.",
+    hint: "El espacio físico no define la cultura, pero los rituales sí.",
     options: [
-      {
-        text: "Volver a la oficina 3 días (Híbrido forzado).",
-        stabilityImpact: -30,
-        moraleImpact: -40,
-        feedback: "📉 Mala decisión. Dos Tech Leads renunciaron. La cultura Dyamanto es asincrónica.",
-        theory: "Disonancia Cognitiva: La práctica contradice los valores declarados."
+      { 
+        text: "Híbrido forzado (3 días).", 
+        stabilityImpact: -30, 
+        moraleImpact: -40, 
+        feedback: "📉 Mala decisión. Dos Tech Leads renunciaron.", 
+        theory: "Disonancia Cognitiva",
+        theoryWhy: "Si predicas 'Autonomía' (Valor Adoptado) pero obligas a la presencialidad sin motivo (Artefacto), creas una incoherencia cultural que rompe el Contrato Psicológico."
       },
-      {
-        text: "Full Remote + Retiros Trimestrales (Off-sites).",
-        stabilityImpact: 10,
-        moraleImpact: 30,
-        feedback: "🏆 Visión. Ahorraste costos y reforzaste la cultura de libertad.",
-        theory: "Cultura Fuerte: Los rituales (retiros) reemplazan al control físico."
+      { 
+        text: "Full Remote + Retiros Trimestrales.", 
+        stabilityImpact: 10, 
+        moraleImpact: 30, 
+        feedback: "🏆 Visión. Ahorraste costos y reforzaste la libertad.", 
+        theory: "Cultura Fuerte vs Débil",
+        theoryWhy: "Reemplazaste el control físico (débil) por rituales intensos de socialización (retiros), lo cual fortalece la cohesión sin sacrificar la autonomía valorada."
       },
-      {
-        text: "Encuesta vinculante: Que el equipo vote.",
-        stabilityImpact: 5,
-        moraleImpact: 15,
-        feedback: "🆗 Democrático. El resultado fue mixto, pero valoraron la voz.",
-        theory: "Justicia Procedimental: El proceso es tan importante como el resultado."
+      { 
+        text: "Encuesta vinculante.", 
+        stabilityImpact: 5, 
+        moraleImpact: 15, 
+        feedback: "🆗 Democrático. Valoraron la voz.", 
+        theory: "Justicia Procedimental",
+        theoryWhy: "A veces el resultado importa menos que el proceso. Permitir que el equipo decida valida su estatus y pertenencia, aumentando el compromiso con la decisión final."
       }
     ]
   },
   {
     id: 3,
     title: "Crisis de Burnout",
-    description: "El proyecto 'Apex' está atrasado. El cliente amenaza con irse. El equipo está trabajando 12 horas diarias.",
-    hint: "Un equipo quemado no innova.",
+    description: "Proyecto 'Apex' atrasado. El cliente amenaza. El equipo trabaja 12hs diarias y está al límite.",
+    hint: "Un equipo quemado no innova, solo sobrevive.",
     options: [
-      {
-        text: "Exigir 'Crunch Time' (Fines de semana).",
-        stabilityImpact: -25,
-        moraleImpact: -70,
-        feedback: "⚠️ Peligroso. La gente está agotada. La calidad del código cae en picada.",
-        theory: "Estrés Laboral: Superaste la capacidad de afrontamiento del grupo."
+      { 
+        text: "Exigir 'Crunch Time' (Fines de semana).", 
+        stabilityImpact: -25, 
+        moraleImpact: -70, 
+        feedback: "⚠️ Peligroso. La calidad del código cae en picada.", 
+        theory: "Modelo Demanda-Control",
+        theoryWhy: "Aumentaste las demandas laborales sin aumentar el control o los recursos del equipo. Esto lleva inevitablemente a la tensión psicológica y al agotamiento (Burnout)."
       },
-      {
-        text: "Recortar alcance (MVP) y mantener fecha.",
-        stabilityImpact: 15,
-        moraleImpact: 30,
-        feedback: "🛡️ Excelente. Priorizaste al equipo sobre el contrato. La lealtad sube.",
-        theory: "Liderazgo de Servicio: Cuidar al equipo asegura sostenibilidad."
+      { 
+        text: "Recortar alcance (Negociar MVP).", 
+        stabilityImpact: 15, 
+        moraleImpact: 30, 
+        feedback: "🛡️ Excelente. Priorizaste al equipo sobre el ego.", 
+        theory: "Liderazgo de Servicio",
+        theoryWhy: "Al remover obstáculos y proteger al equipo de demandas externas irreales, demuestras que el bienestar es un valor real, no solo un slogan, aumentando la lealtad."
       },
-      {
-        text: "Contratar freelancers externos de urgencia.",
-        stabilityImpact: 5,
-        moraleImpact: -10,
-        feedback: "😐 Parche. Ayudó a entregar, pero el equipo se sintió invadido.",
-        theory: "Cohesión Grupal: Los externos pueden romper la dinámica interna."
+      { 
+        text: "Contratar externos urgentes.", 
+        stabilityImpact: 5, 
+        moraleImpact: -10, 
+        feedback: "😐 Parche. El equipo se siente invadido.", 
+        theory: "Ley de Brooks",
+        theoryWhy: "Añadir mano de obra a un proyecto de software atrasado lo atrasa más, debido a la complejidad de la comunicación y la curva de aprendizaje (Costo de Coordinación)."
       }
     ]
   },
   {
     id: 4,
     title: "Integración de IA",
-    description: "La IA puede hacer el 40% del trabajo junior. Los inversores quieren reducir costos de personal.",
-    hint: "La tecnología debe potenciar, no reemplazar.",
+    description: "IA puede hacer el 40% del trabajo junior. Inversores quieren reducir costos ya.",
+    hint: "La tecnología debe potenciar, no reemplazar el alma.",
     options: [
-      {
-        text: "Despedir Juniors y automatizar.",
-        stabilityImpact: -50,
-        moraleImpact: -60,
-        feedback: "🤖 Pánico. Los Seniors temen ser los siguientes. El clima es fúnebre.",
-        theory: "Contrato Psicológico: Roto. La lealtad desapareció."
+      { 
+        text: "Despedir Juniors y automatizar.", 
+        stabilityImpact: -50, 
+        moraleImpact: -60, 
+        feedback: "🤖 Pánico. Seniors temen ser los siguientes.", 
+        theory: "Violación del Contrato Psicológico",
+        theoryWhy: "Rompiste la promesa implícita de seguridad y carrera. La confianza organizacional tarda años en construirse y segundos en destruirse."
       },
-      {
-        text: "Capacitar a todos como 'AI Pilots'.",
-        stabilityImpact: 20,
-        moraleImpact: 20,
-        feedback: "🚀 Innovación. Transformaste una amenaza en una oportunidad de desarrollo.",
-        theory: "Organización que Aprende (Senge): Adaptabilidad constante."
+      { 
+        text: "Capacitar 'AI Pilots' (Upskilling).", 
+        stabilityImpact: 20, 
+        moraleImpact: 20, 
+        feedback: "🚀 Innovación. Oportunidad de desarrollo.", 
+        theory: "Organización que Aprende (Senge)",
+        theoryWhy: "Transformaste una amenaza externa en una oportunidad de aprendizaje. Fomentar la maestría personal aumenta la motivación intrínseca."
       },
-      {
-        text: "Formar un equipo experimental de IA.",
-        stabilityImpact: 10,
-        moraleImpact: 5,
-        feedback: "🧪 Cauteloso. Buen primer paso, pero lento.",
-        theory: "Gestión del Cambio: Los pilotos reducen el riesgo percibido."
+      { 
+        text: "Crear equipo experimental aislado.", 
+        stabilityImpact: 10, 
+        moraleImpact: 5, 
+        feedback: "🧪 Cauteloso pero lento.", 
+        theory: "Ambidestrez Organizacional",
+        theoryWhy: "Separaste la explotación (negocio actual) de la exploración (IA). Es seguro, pero puede crear silos culturales entre 'los innovadores' y 'los viejos'."
       }
     ]
   },
   {
     id: 5,
-    title: "Salud Mental",
-    description: "Un desarrollador clave (Rockstar) es brillante pero tóxico con sus compañeros.",
-    hint: "La manzana podrida pudre el cajón.",
+    title: "El 'Rockstar' Tóxico",
+    description: "Tu mejor programador es técnicamente brillante pero humilla a sus compañeros.",
+    hint: "La manzana podrida pudre el cajón entero.",
     options: [
-      {
-        text: "Despedirlo. La cultura es innegociable.",
-        stabilityImpact: -10,
-        moraleImpact: 40,
-        feedback: "✂️ Valiente. Perdiste velocidad técnica, pero el equipo respira aliviado.",
-        theory: "Normas Grupales: Tolerancia cero a la toxicidad refuerza valores."
+      { 
+        text: "Despedirlo inmediatamente.", 
+        stabilityImpact: -10, 
+        moraleImpact: 40, 
+        feedback: "✂️ Valiente. El equipo respira aliviado.", 
+        theory: "Normas de Grupo",
+        theoryWhy: "Al expulsar al desviado que viola las normas de respeto, reafirmas los límites culturales. El rendimiento del grupo supera al del individuo tóxico."
       },
-      {
-        text: "Ignorarlo. Produce demasiado bien.",
-        stabilityImpact: 10,
-        moraleImpact: -50,
-        feedback: "☠️ Hipocresía. Los valores de 'Respeto' son papel mojado.",
-        theory: "Incongruencia Cultural: Lo que haces habla más fuerte que lo que dices."
+      { 
+        text: "Ignorarlo (Produce demasiado bien).", 
+        stabilityImpact: 10, 
+        moraleImpact: -50, 
+        feedback: "☠️ Hipocresía. Valores rotos.", 
+        theory: "Incongruencia de Valores",
+        theoryWhy: "Demostraste que los resultados importan más que los valores. Esto legitima el comportamiento tóxico y erosiona la seguridad psicológica del resto."
       },
-      {
-        text: "Coaching obligatorio y ultimátum.",
-        stabilityImpact: 5,
-        moraleImpact: 10,
-        feedback: "🤝 Justo. Le diste una oportunidad de corregir.",
-        theory: "Desarrollo Organizacional: Creer en la capacidad de cambio de las personas."
+      { 
+        text: "Coaching y ultimátum.", 
+        stabilityImpact: 5, 
+        moraleImpact: 10, 
+        feedback: "🤝 Justo. Oportunidad de cambio.", 
+        theory: "Refuerzo y Feedback",
+        theoryWhy: "Aplicas corrección progresiva. Es justo dar una oportunidad, pero debe quedar claro que la competencia técnica no excusa la incompetencia emocional."
       }
     ]
   },
   {
     id: 6,
     title: "El Consultor Externo",
-    description: "Contratan a un experto que quiere cambiar todos los procesos de Dyamanto por los de un libro.",
-    hint: "La cultura no se importa, se cultiva.",
+    description: "Viene un experto de Big Tech queriendo cambiar procesos por los de un libro.",
+    hint: "La cultura se cultiva, no se importa.",
     options: [
-      {
-        text: "Darle autoridad total. 'Él es el experto'.",
-        stabilityImpact: -20,
-        moraleImpact: -20,
-        feedback: "📚 Fracaso. La cultura no se importa, se construye.",
-        theory: "Cultura Organizacional: Cada sistema social es único."
+      { 
+        text: "Darle autoridad total.", 
+        stabilityImpact: -20, 
+        moraleImpact: -20, 
+        feedback: "📚 Fracaso. Cada sistema es único.", 
+        theory: "Ajuste Cultural",
+        theoryWhy: "Intentar 'cortar y pegar' cultura de otra empresa ignora la historia y los supuestos básicos de Dyamanto. Genera rechazo inmunológico organizacional."
       },
-      {
-        text: "Diagnóstico primero: 'Observa 2 semanas'.",
-        stabilityImpact: 10,
-        moraleImpact: 10,
-        feedback: "🧠 Sabio. Diagnóstico antes de intervención.",
-        theory: "Modelo de Schein: Entender las presunciones básicas antes de tocar los artefactos."
+      { 
+        text: "Diagnóstico primero (Escuchar).", 
+        stabilityImpact: 10, 
+        moraleImpact: 10, 
+        feedback: "🧠 Sabio. Entender antes de actuar.", 
+        theory: "Investigación-Acción",
+        theoryWhy: "El consultor efectivo facilita que la organización se entienda a sí misma (Schein), en lugar de imponer soluciones externas ('Doctor-Paciente')."
       },
-      {
-        text: "Rechazarlo. 'Nosotros sabemos más'.",
-        stabilityImpact: -5,
-        moraleImpact: 5,
-        feedback: "🔒 Cerrado. Reforzaste la identidad, pero perdiste aprendizaje.",
-        theory: "Síndrome de 'No inventado aquí': Rechazo a lo externo."
+      { 
+        text: "Rechazarlo.", 
+        stabilityImpact: -5, 
+        moraleImpact: 5, 
+        feedback: "🔒 Cerrado. Perdiste aprendizaje.", 
+        theory: "Síndrome 'No inventado aquí'",
+        theoryWhy: "Rechazar ideas solo por venir de afuera es una defensa del ego grupal que lleva a la ceguera estratégica y al estancamiento."
       }
     ]
   },
   {
     id: 7,
     title: "Salarios Transparentes",
-    description: "Se filtró una planilla de sueldos. Hay inequidades grandes entre gente del mismo rango.",
-    hint: "La justicia percibida es crítica.",
+    description: "Alguien filtró la planilla de sueldos. Hay inequidades claras y enojo.",
+    hint: "La luz del sol es el mejor desinfectante.",
     options: [
-      {
-        text: "Caza de brujas: Despedir al filtrador.",
-        stabilityImpact: -50,
-        moraleImpact: -70,
-        feedback: "☠️ Tóxico. Mataste al mensajero pero el problema sigue. Miedo generalizado.",
-        theory: "Seguridad Psicológica: Destruida completamente."
+      { 
+        text: "Caza de brujas (Buscar al culpable).", 
+        stabilityImpact: -50, 
+        moraleImpact: -70, 
+        feedback: "☠️ Ambiente de terror.", 
+        theory: "Seguridad Psicológica (Edmondson)",
+        theoryWhy: "Castigar al mensajero (o filtrador) en lugar de abordar el problema sistémico (inequidad) destruye la confianza y silencia futuros problemas."
       },
-      {
-        text: "Nivelación Salarial Pública (Open Salary).",
-        stabilityImpact: 15,
-        moraleImpact: 30,
-        feedback: "⚖️ Justicia Radical. Doloroso financieramente, pero sanador culturalmente.",
-        theory: "Equidad Organizacional: Fundamental para la motivación."
+      { 
+        text: "Nivelación Pública y Transparencia.", 
+        stabilityImpact: 15, 
+        moraleImpact: 30, 
+        feedback: "⚖️ Justicia Radical. Sanador.", 
+        theory: "Teoría de la Equidad (Adams)",
+        theoryWhy: "Al restaurar el equilibrio entre inputs y outputs de forma transparente, eliminas la percepción de injusticia y recuperas la motivación."
       },
-      {
-        text: "Ajustes privados 'caso por caso'.",
-        stabilityImpact: 5,
-        moraleImpact: -10,
-        feedback: "🤫 Opaco. La desconfianza persiste.",
-        theory: "Transparencia: La falta de ella genera rumores."
+      { 
+        text: "Ajustes privados (1 a 1).", 
+        stabilityImpact: 5, 
+        moraleImpact: -10, 
+        feedback: "🤫 Opaco. La desconfianza persiste.", 
+        theory: "Justicia Distributiva vs Procedimental",
+        theoryWhy: "Arreglaste el dinero (distributiva) pero no el proceso (procedimental). El secreto mantiene la sospecha de que el sistema sigue siendo injusto."
       }
     ]
   },
   {
     id: 8,
     title: "Diversidad e Inclusión",
-    description: "El equipo es 90% hombres. Tienes 2 candidatos: un amigo de la casa y una mujer externa muy calificada.",
+    description: "Equipo 90% hombres. Candidatos finales: Un amigo referido vs Una mujer experta.",
     hint: "La homogeneidad mata la creatividad.",
     options: [
-      {
-        text: "Contratar al amigo. 'Cultural fit' asegurado.",
-        stabilityImpact: -15,
-        moraleImpact: 0,
-        feedback: "🚫 Estancamiento. Refuerzas el sesgo de afinidad. Dyamanto se vuelve un club de amigos.",
-        theory: "Pensamiento de Grupo (Groupthink): La falta de diversidad reduce la innovación."
+      { 
+        text: "Contratar al amigo (Cultural Fit).", 
+        stabilityImpact: -15, 
+        moraleImpact: 0, 
+        feedback: "🚫 Estancamiento. Más de lo mismo.", 
+        theory: "Pensamiento de Grupo (Groupthink)",
+        theoryWhy: "Priorizar la comodidad y la afinidad sobre la diversidad reduce la fricción cognitiva necesaria para la innovación y la resolución compleja de problemas."
       },
-      {
-        text: "Contratar a la mujer. Nuevas perspectivas.",
-        stabilityImpact: 15,
-        moraleImpact: 10,
-        feedback: "🌍 Crecimiento. La diversidad cognitiva mejora la resolución de problemas.",
-        theory: "Innovación: Requiere fricción creativa y puntos de vista diversos."
+      { 
+        text: "Contratar experta (Cultural Add).", 
+        stabilityImpact: 15, 
+        moraleImpact: 10, 
+        feedback: "🌍 Crecimiento. Diversidad cognitiva.", 
+        theory: "Diversidad Cognitiva",
+        theoryWhy: "No buscas alguien que 'encaje' (Fit), sino que 'sume' (Add). Perspectivas diferentes previenen puntos ciegos estratégicos."
       },
-      {
-        text: "Contratar a ambos.",
-        stabilityImpact: -10,
-        moraleImpact: 15,
-        feedback: "💰 Caro. Resolviste el dilema gastando presupuesto extra.",
-        theory: "Holgura Organizacional: Recursos extra permiten evitar conflictos."
+      { 
+        text: "Contratar ambos.", 
+        stabilityImpact: -10, 
+        moraleImpact: 15, 
+        feedback: "💰 Caro pero efectivo.", 
+        theory: "Holgura Organizacional (Slack)",
+        theoryWhy: "Tener recursos extra (holgura) permite experimentar y absorber shocks, aunque la eficiencia financiera a corto plazo disminuya."
       }
     ]
   },
   {
     id: 9,
-    title: "La Oferta de Compra",
-    description: "Una Big Tech quiere comprar Dyamanto. Mucho dinero, pero Dyamanto perdería su marca y autonomía.",
-    hint: "El propósito es el pegamento de la organización.",
+    title: "Oferta de Compra",
+    description: "Big Tech quiere comprar Dyamanto. Todos se harían ricos, pero pierden autonomía.",
+    hint: "¿Cuál es el propósito real de la organización?",
     options: [
-      {
-        text: "Vender. 'Es solo negocios'.",
-        stabilityImpact: -20,
-        moraleImpact: -50,
-        feedback: "💸 Rico pero vacío. El propósito de 'Autonomía' desaparece. Éxodo masivo.",
-        theory: "Propósito: El dinero es un factor higiénico, no motivacional a largo plazo."
+      { 
+        text: "Vender y cobrar.", 
+        stabilityImpact: -20, 
+        moraleImpact: -50, 
+        feedback: "💸 Rico pero vacío. Éxodo de talento.", 
+        theory: "Motivación Intrínseca vs Extrínseca",
+        theoryWhy: "El dinero (extrínseco) no sostiene el compromiso a largo plazo. Al vender el propósito (intrínseco), mataste el 'alma' de la empresa."
       },
-      {
-        text: "Rechazar. 'Somos piratas'.",
-        stabilityImpact: 20,
-        moraleImpact: 60,
-        feedback: "💎 Identidad Pura. El equipo celebra como si hubieran ganado el mundial.",
-        theory: "Compromiso Afectivo: La gente se queda por la misión."
+      { 
+        text: "Rechazar para mantener la cultura.", 
+        stabilityImpact: 20, 
+        moraleImpact: 60, 
+        feedback: "💎 Identidad Pura. Celebración épica.", 
+        theory: "Compromiso Afectivo",
+        theoryWhy: "Reafirmar la identidad organizacional sobre el beneficio económico genera una lealtad emocional profunda (Engagement) inigualable."
       },
-      {
-        text: "Venta parcial (Joint Venture).",
-        stabilityImpact: 10,
-        moraleImpact: -10,
-        feedback: "🤝 Híbrido. Ganaste recursos pero perdiste agilidad.",
-        theory: "Estructura: La burocracia aumenta con el tamaño."
+      { 
+        text: "Joint Venture.", 
+        stabilityImpact: 10, 
+        moraleImpact: -10, 
+        feedback: "🤝 Híbrido. Burocracia sube.", 
+        theory: "Dependencia de Recursos",
+        theoryWhy: "Aseguras recursos, pero la dependencia externa fuerza a la organización a modificar su estructura para satisfacer a quien controla esos recursos."
       }
     ]
   },
   {
     id: 10,
     title: "El Futuro",
-    description: "Dyamanto sobrevivió. Ahora toca definir la visión a 5 años. ¿Qué priorizas?",
+    description: "Debes definir la visión a 5 años para cerrar tu legado.",
     hint: "El futuro es descentralizado.",
     options: [
-      {
-        text: "Maximizar beneficios (Modelo Clásico).",
-        stabilityImpact: -10,
-        moraleImpact: -10,
-        feedback: "📉 Aburrido. Volviste a la gestión tradicional.",
-        theory: "Teoría Clásica vs. Contemporánea."
+      { 
+        text: "Maximizar beneficios (IPO).", 
+        stabilityImpact: -10, 
+        moraleImpact: -10, 
+        feedback: "📉 Aburrido. El fin de la magia.", 
+        theory: "Primacía del Accionista",
+        theoryWhy: "El enfoque tradicional de Friedman. Funciona financieramente, pero en la economía del conocimiento, desinspira al talento creativo."
       },
-      {
-        text: "DAO (Org. Autónoma Descentralizada).",
-        stabilityImpact: 20,
-        moraleImpact: 20,
-        feedback: "🚀 Futuro. Llevaste la 'Horizontalidad' al extremo lógico.",
-        theory: "Nuevos Paradigmas Organizacionales."
+      { 
+        text: "Convertirse en DAO (Cooperativa Digital).", 
+        stabilityImpact: 20, 
+        moraleImpact: 20, 
+        feedback: "🚀 Futuro. Propiedad compartida.", 
+        theory: "Gestión Autogestionada (Teal)",
+        theoryWhy: "Evolucionar hacia la autogestión total (Laloux) distribuye el poder y la responsabilidad, creando un organismo vivo altamente adaptable."
       },
-      {
-        text: "Expansión Global Agresiva.",
-        stabilityImpact: -20,
-        moraleImpact: 10,
-        feedback: "🌍 Riesgo. Creces rápido pero la cultura se diluye.",
-        theory: "Escalabilidad Cultural: El desafío de mantener valores al crecer."
+      { 
+        text: "Expansión agresiva global.", 
+        stabilityImpact: -20, 
+        moraleImpact: 10, 
+        feedback: "🌍 Riesgo cultural alto.", 
+        theory: "Dilema de Crecimiento",
+        theoryWhy: "Escalar rápido suele diluir la cultura fundacional. La estructura crece más rápido que la socialización, creando fragmentación."
       }
     ]
   }
@@ -303,49 +336,50 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [gameState, setGameState] = useState<GameState>(GameState.INTRO);
   const [feedback, setFeedback] = useState<string>("");
   const [theory, setTheory] = useState<string>("");
+  const [theoryWhy, setTheoryWhy] = useState<string>("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastImpact, setLastImpact] = useState<{stability: number, morale: number}>({stability: 0, morale: 0});
   const [hintUsed, setHintUsed] = useState(false);
   const [streak, setStreak] = useState(0);
-  
-  // Random Event State
   const [randomEvent, setRandomEvent] = useState<{text: string, impact: number} | null>(null);
 
-  // Generate physics trajectories only once per game reset
+  // Physics trajectories memoized
   const trajectories = useMemo(() => {
     return Array.from({ length: 9 }).map(() => ({
-      x: (Math.random() - 0.5) * 600, // Explode sideways
-      y: 200 + Math.random() * 400,   // Fall down
-      r: (Math.random() - 0.5) * 360  // Rotate wildly
+      x: (Math.random() - 0.5) * 600,
+      y: 200 + Math.random() * 400,
+      r: (Math.random() - 0.5) * 360
     }));
-  }, [gameState === GameState.INTRO]); // Regenerate when game restarts
+  }, [gameState === GameState.INTRO]);
 
   const currentLevel = GAME_LEVELS[levelIndex];
-  const tiltAngle = (100 - stability) * 0.2 * (levelIndex % 2 === 0 ? 1 : -1);
-
+  
+  // Dynamic Background
   const getBgColor = () => {
     if (morale > 70) return 'from-indigo-950 via-slate-900 to-indigo-950';
     if (morale > 40) return 'from-slate-900 via-stone-800 to-slate-900';
     return 'from-red-950 via-rose-950 to-slate-900';
   };
 
+  // Game Loop Checks
   useEffect(() => {
     if ((stability <= 0 || morale <= 0) && gameState !== GameState.COLLAPSING && gameState !== GameState.LOST) {
       setGameState(GameState.COLLAPSING);
-      setTimeout(() => setGameState(GameState.LOST), 2000); // Wait for explosion animation
+      setTimeout(() => setGameState(GameState.LOST), 1500);
     } else if (levelIndex >= GAME_LEVELS.length && !showFeedback && stability > 0 && morale > 0) {
       setGameState(GameState.WON);
     }
   }, [stability, morale, levelIndex, showFeedback, gameState]);
 
+  // Events Logic
   const triggerRandomEvent = () => {
       const chance = Math.random();
-      if (chance > 0.8 && levelIndex > 1 && levelIndex < 8) {
+      if (chance > 0.85 && levelIndex > 1 && levelIndex < 8) {
           const events = [
-              { text: "📉 Caída de Servidores AWS: El equipo está estresado.", impact: -10, type: 'morale' },
-              { text: "🐦 Tweet Viral Positivo: Orgullo de pertenencia.", impact: 10, type: 'morale' },
-              { text: "💸 Inversor Retira Fondos: Ajuste de presupuesto.", impact: -10, type: 'stability' },
-              { text: "🦠 Gripe estacional: 20% del equipo enfermo.", impact: -5, type: 'stability' }
+              { text: "📉 Caída de AWS: Estrés masivo.", impact: -10, type: 'morale' },
+              { text: "🐦 Tweet Viral: Orgullo.", impact: 10, type: 'morale' },
+              { text: "💸 Recorte de Presupuesto.", impact: -10, type: 'stability' },
+              { text: "🦠 Gripe en la oficina.", impact: -5, type: 'stability' }
           ];
           const evt = events[Math.floor(Math.random() * events.length)];
           setRandomEvent({ text: evt.text, impact: evt.impact });
@@ -363,32 +397,27 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const selected = currentLevel.options[optionIndex];
     setLastImpact({ stability: selected.stabilityImpact, morale: selected.moraleImpact });
     
-    // Check for streak (Good choices usually add morale or stability)
-    if (selected.stabilityImpact > 0 && selected.moraleImpact > 0) {
-        setStreak(s => s + 1);
-    } else {
-        setStreak(0);
-    }
+    if (selected.stabilityImpact > 0 && selected.moraleImpact > 0) setStreak(s => s + 1);
+    else setStreak(0);
 
     setStability(prev => Math.min(100, Math.max(0, prev + selected.stabilityImpact)));
     setMorale(prev => Math.min(100, Math.max(0, prev + selected.moraleImpact)));
 
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        if (selected.stabilityImpact < 0) navigator.vibrate([100, 50, 100, 50, 200]);
+        if (selected.stabilityImpact < 0) navigator.vibrate([100, 50, 100]);
         else navigator.vibrate(50);
     }
 
     setFeedback(selected.feedback);
     setTheory(selected.theory);
+    setTheoryWhy(selected.theoryWhy || "");
     setShowFeedback(true);
   };
 
   const nextLevel = () => {
     setShowFeedback(false);
     setHintUsed(false);
-    if (stability > 0 && morale > 0) {
-        triggerRandomEvent();
-    }
+    if (stability > 0 && morale > 0) triggerRandomEvent();
   };
 
   const nextLevelDirect = () => {
@@ -412,84 +441,38 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       setGameState(GameState.INTRO);
       setShowFeedback(false);
       setHintUsed(false);
-  }
+  };
 
   const isCollapsing = gameState === GameState.COLLAPSING || gameState === GameState.LOST;
+  const tiltAngle = (100 - stability) * 0.2 * (levelIndex % 2 === 0 ? 1 : -1);
 
   return (
     <div className={`h-full w-full bg-gradient-to-br ${getBgColor()} text-white flex flex-col relative overflow-hidden font-sans transition-all duration-1000`}>
       
-      {/* Floating Particles */}
+      {/* Noise Texture */}
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
       
-      {/* HUD & Navigation */}
-      <div className="flex justify-between items-start p-3 pt-safe z-20 glass m-2 rounded-2xl backdrop-blur-md border-b border-white/10 shrink-0">
-        
-        {/* IMPROVED BACK BUTTON */}
-        <button 
-            onClick={onBack} 
-            className="flex items-center justify-center w-10 h-10 bg-white/10 rounded-full hover:bg-white/20 transition-all active:scale-95 border border-white/5"
-            aria-label="Volver"
-        >
-            <span className="text-xl">🏠</span>
-        </button>
-        
-        <div className="flex flex-col flex-1 mx-3 space-y-2 mt-1 min-w-0">
-            {/* Stability Bar */}
-            <div className="flex flex-col">
-                <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1">
-                    <span className="text-indigo-300 truncate mr-2">Estructura</span>
-                    <span>{stability}%</span>
-                </div>
-                <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
-                    <div className={`h-full transition-all duration-700 ease-out ${stability > 50 ? 'bg-indigo-400' : 'bg-red-500'}`} style={{ width: `${stability}%` }}></div>
-                </div>
-            </div>
-            
-            {/* Morale Bar */}
-            <div className="flex flex-col">
-                <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1">
-                    <span className="text-pink-300 truncate mr-2">Moral</span>
-                    <span>{morale}% {morale > 80 ? '🔥' : morale < 30 ? '😭' : '😐'}</span>
-                </div>
-                <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
-                    <div className={`h-full transition-all duration-700 ease-out ${morale > 50 ? 'bg-pink-400' : 'bg-orange-500'}`} style={{ width: `${morale}%` }}></div>
-                </div>
-            </div>
-        </div>
+      {/* 1. TOP HUD - Respects Notch */}
+      <SimulatorHUD 
+        stability={stability}
+        morale={morale}
+        level={Math.min(levelIndex + 1, GAME_LEVELS.length)}
+        totalLevels={GAME_LEVELS.length}
+        streak={streak}
+        onBack={onBack}
+      />
 
-        <div className="flex flex-col gap-1 items-end shrink-0">
-             <div className="text-xs font-black bg-white/10 px-3 py-1 rounded-lg border border-white/10 shadow-inner whitespace-nowrap">
-                {Math.min(levelIndex + 1, GAME_LEVELS.length)}/10
-            </div>
-            {streak > 2 && <div className="text-[10px] text-yellow-300 font-bold animate-pulse whitespace-nowrap">Streak x{streak}!</div>}
-        </div>
-      </div>
-
-      {/* Main Game Area - Flex & Centered for Responsiveness */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-4 pb-32 overflow-hidden min-h-0">
-        
-        {/* TOWER - SCALED FOR MOBILE */}
-        <div 
-            className="w-48 sm:w-56 mb-4 transition-all duration-1000 ease-out relative perspective-1000 shrink-0"
+      {/* 2. GAME AREA (Tower) - Flexible */}
+      <div className="flex-1 relative flex items-center justify-center min-h-0 w-full z-10">
+         <div 
+            className="w-48 sm:w-56 transition-all duration-700 ease-out relative perspective-1000"
             style={{ 
-                transform: isCollapsing ? 'none' : `rotate(${tiltAngle}deg) scale(${1 + (100-stability)*0.002})`,
-                opacity: (gameState === GameState.INTRO || gameState === GameState.EVENT) ? 0.2 : 1
+                transform: isCollapsing 
+                    ? 'translateY(100px)' 
+                    : `rotate(${tiltAngle}deg) scale(${1 + (100-stability)*0.002}) translateY(${gameState === GameState.PLAYING ? '-15%' : '0'})`, 
+                opacity: (gameState === GameState.INTRO || gameState === GameState.EVENT) ? 0.3 : 1
             }}
         >
-             {/* Score Popup */}
-             {showFeedback && (
-                <div className="absolute -top-20 left-1/2 -translate-x-1/2 flex gap-4 z-50 animate-pop pointer-events-none">
-                    <div className={`font-black text-2xl drop-shadow-md ${lastImpact.stability >= 0 ? 'text-indigo-400' : 'text-red-500'}`}>
-                        {lastImpact.stability >= 0 ? '+' : ''}{lastImpact.stability} 🏗️
-                    </div>
-                    <div className={`font-black text-2xl drop-shadow-md ${lastImpact.morale >= 0 ? 'text-pink-400' : 'text-orange-500'}`}>
-                        {lastImpact.morale >= 0 ? '+' : ''}{lastImpact.morale} ❤️
-                    </div>
-                </div>
-            )}
-
-            {/* Tower Base */}
             <div className={`h-6 w-full -ml-[2%] bg-slate-800 rounded-lg mb-2 shadow-2xl border-t border-slate-600 transition-opacity duration-300 ${isCollapsing ? 'opacity-0' : 'opacity-100'}`}></div>
 
             <div className="flex flex-col-reverse gap-1 perspective-origin-bottom">
@@ -504,141 +487,35 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 {levelIndex > 8 && <JengaBlock type="value" label="INNOVACIÓN" stability={stability} index={8} isFalling={isCollapsing} trajectory={trajectories[8]} />}
             </div>
         </div>
-
-        {/* UI PANELS (Absolute positioning to overlay tower on small screens) */}
-        <div className="w-full max-w-sm absolute bottom-4 z-30 pb-safe">
-            
-            {/* INTRO */}
-            {gameState === GameState.INTRO && (
-                <div className="glass p-6 rounded-3xl text-center shadow-2xl animate-slide-up bg-slate-900/60 mx-4 border border-white/10">
-                    <div className="text-6xl mb-4 drop-shadow-lg">🏛️</div>
-                    <h2 className="text-2xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">CEO Simulator</h2>
-                    <p className="text-slate-300 text-xs mb-6 leading-relaxed">
-                        Equilibra la <strong>Estabilidad</strong> de la empresa y la <strong>Moral</strong> del equipo.
-                    </p>
-                    <button 
-                        onClick={() => setGameState(GameState.PLAYING)}
-                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-4 rounded-2xl font-bold shadow-lg shadow-indigo-500/40 hover:scale-[1.02] text-white tracking-widest active:scale-95 transition-all"
-                    >
-                        INICIAR GESTIÓN
-                    </button>
-                </div>
-            )}
-
-            {/* EVENT */}
-            {gameState === GameState.EVENT && randomEvent && (
-                 <div className="glass bg-slate-800 p-6 rounded-3xl text-center shadow-2xl animate-pop border-2 border-yellow-500/50 mx-4">
-                     <div className="text-5xl mb-4 animate-shake">⚡</div>
-                     <h3 className="text-lg font-bold text-yellow-400 mb-2">EVENTO ALEATORIO</h3>
-                     <p className="text-white text-base mb-6">{randomEvent.text}</p>
-                     <div className="text-red-400 font-mono font-bold text-lg mb-6">
-                         Impacto: {randomEvent.impact}
-                     </div>
-                     <button onClick={nextLevelDirect} className="w-full bg-white/10 hover:bg-white/20 py-3 rounded-xl text-white font-bold transition-colors">
-                         Continuar
-                     </button>
-                 </div>
-            )}
-
-            {/* PLAYING - QUESTION */}
-            {gameState === GameState.PLAYING && !showFeedback && currentLevel && (
-                <div className="bg-slate-800/95 backdrop-blur-md text-white p-5 rounded-3xl shadow-2xl animate-slide-up border border-white/10 mx-2">
-                    <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-base font-black text-indigo-300 leading-tight">{currentLevel.title}</h3>
-                        {!hintUsed && (
-                            <button onClick={useHint} className="text-[10px] bg-indigo-500/20 text-indigo-200 px-2 py-1 rounded border border-indigo-500/50 hover:bg-indigo-500/40 transition-colors whitespace-nowrap">
-                                💡 Pista (-10 Moral)
-                            </button>
-                        )}
-                        {hintUsed && <span className="text-[10px] text-yellow-300 animate-pulse whitespace-nowrap">Asesor activado</span>}
-                    </div>
-                    
-                    {hintUsed && (
-                        <div className="bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-xl mb-3 text-[10px] text-yellow-200 italic">
-                             "Asesor: {currentLevel.hint}"
-                        </div>
-                    )}
-
-                    <p className="text-slate-300 text-xs mb-4 leading-relaxed border-l-2 border-indigo-500 pl-3">
-                        {currentLevel.description}
-                    </p>
-                    <div className="grid gap-2 max-h-[30vh] overflow-y-auto pr-1">
-                        {currentLevel.options.map((opt, i) => (
-                            <button 
-                                key={i}
-                                onClick={() => handleChoice(i)}
-                                className="text-left p-3 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-400 hover:bg-white/10 transition-all active:scale-[0.98] text-xs font-medium flex items-center group relative overflow-hidden shrink-0"
-                            >
-                                <span className="mr-3 bg-indigo-600 text-white w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-lg text-[10px] font-bold shadow-lg group-hover:scale-110 transition-transform z-10">
-                                    {String.fromCharCode(65 + i)}
-                                </span>
-                                <span className="z-10 relative leading-tight">{opt.text}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* PLAYING - FEEDBACK */}
-            {gameState === GameState.PLAYING && showFeedback && (
-                <div className="glass bg-slate-900/95 text-white p-6 rounded-3xl shadow-2xl animate-pop border border-white/20 mx-4">
-                     <div className="mb-3 flex items-center gap-3">
-                        <span className="text-4xl filter drop-shadow-md">
-                            {feedback.includes('Error') || feedback.includes('Colapso') || feedback.includes('Mala') || feedback.includes('Pánico') ? '❌' : '✨'}
-                        </span>
-                        <div className="h-px bg-white/20 flex-1"></div>
-                     </div>
-                     <p className="font-bold text-sm mb-4 leading-snug">{feedback}</p>
-                     <div className="bg-indigo-900/30 p-3 rounded-xl mb-6 border border-indigo-500/20">
-                        <p className="text-[10px] text-indigo-300 font-black uppercase mb-1 tracking-widest">💡 Teoría Aplicada</p>
-                        <p className="text-xs italic text-slate-300 leading-relaxed">"{theory}"</p>
-                     </div>
-                     <button 
-                        onClick={nextLevel}
-                        className="w-full bg-white text-slate-900 font-bold py-3 rounded-xl hover:bg-indigo-50 transition-colors shadow-lg active:scale-95 text-sm"
-                    >
-                        {levelIndex < GAME_LEVELS.length - 1 ? 'Siguiente Desafío →' : 'Ver Informe Final'}
-                    </button>
-                </div>
-            )}
-
-            {/* GAME OVER */}
-            {gameState === GameState.LOST && (
-                <div className="bg-rose-950/95 backdrop-blur-xl p-6 rounded-3xl text-center shadow-2xl border-2 border-rose-500 animate-slide-up z-50 mx-4">
-                    <div className="text-6xl mb-4 animate-shake">🏚️</div>
-                    <h2 className="text-3xl font-black text-white mb-2 tracking-tighter">COLAPSO</h2>
-                    <p className="text-rose-200 text-sm mb-6 font-medium">
-                        {stability <= 0 ? "La falta de procesos sólidos derrumbó la estructura." : "El equipo renunció masivamente (Moral 0)."}
-                    </p>
-                    <button onClick={restart} className="bg-rose-600 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-rose-500 transition-colors w-full uppercase tracking-widest active:scale-95 text-sm">
-                        Reconstruir Dyamanto
-                    </button>
-                </div>
-            )}
-
-            {/* WIN */}
-            {gameState === GameState.WON && (
-                <div className="bg-emerald-900/95 backdrop-blur-xl p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400 animate-slide-up z-50 mx-4">
-                    <div className="text-6xl mb-4 animate-bounce">💎</div>
-                    <h2 className="text-2xl font-black text-white mb-2">CULTURA DE DIAMANTE</h2>
-                    <div className="grid grid-cols-2 gap-4 text-xs bg-black/30 p-4 rounded-xl mb-6 text-center font-mono">
-                        <div>
-                            <p className="text-slate-400">Estabilidad</p>
-                            <p className="text-xl text-emerald-300 font-bold">{stability}</p>
-                        </div>
-                        <div>
-                            <p className="text-slate-400">Moral</p>
-                            <p className="text-xl text-pink-300 font-bold">{morale}</p>
-                        </div>
-                    </div>
-                    <button onClick={onBack} className="bg-white text-emerald-900 px-8 py-4 rounded-full font-bold shadow-lg w-full hover:scale-105 transition-transform text-sm">
-                        Volver al Hub
-                    </button>
-                </div>
-            )}
-
-        </div>
       </div>
+
+      {/* 3. INTERACTION AREA (Card) - Bottom safe aligned */}
+      <div className="w-full flex justify-center items-end pb-safe z-30 shrink-0 relative px-4 mb-2">
+         <SimulatorCard 
+            gameState={gameState}
+            currentLevel={currentLevel}
+            randomEvent={randomEvent}
+            feedback={feedback}
+            theory={theory}
+            theoryWhy={theoryWhy}
+            showFeedback={showFeedback}
+            hintUsed={hintUsed}
+            isCollapsing={isCollapsing}
+            stability={stability}
+            morale={morale}
+            lastImpact={lastImpact}
+            levelIndex={levelIndex}
+            totalLevels={GAME_LEVELS.length}
+            onStart={() => setGameState(GameState.PLAYING)}
+            onChoice={handleChoice}
+            onNext={nextLevel}
+            onContinue={nextLevelDirect}
+            onRestart={restart}
+            onBack={onBack}
+            onUseHint={useHint}
+         />
+      </div>
+
     </div>
   );
 };

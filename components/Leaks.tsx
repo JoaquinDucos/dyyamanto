@@ -1,16 +1,16 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { ChatNode, Message } from '../types';
+import MessageBubble from './MessageBubble';
+import ChatHeader from './ChatHeader';
 
-// Images & Assets
+// Assets
 const SAPEEE_IMG_URL = "https://preview.redd.it/z3nj57t6grm61.jpg?auto=webp&s=9eecb9cefdd01cd2be90c4cdc5653e300d27d37f";
-const FALLBACK_IMG_URL = "https://placehold.co/400x300/EEE/31343C?text=Image+Error";
 const HOMER_GIF_URL = "https://media.giphy.com/media/COYGe9rZvfiaQ/giphy.gif"; 
-// UPDATED STICKER URL
 const FIST_BUMP_URL = "https://media1.tenor.com/m/2s_01Z0e1MQAAAAC/arnold-schwarzenegger-predator.gif";
 const VALORANT_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4eGp2c3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4/3o7527pa7qs9kCG78A/giphy.gif";
 
-// --- STORY LOGIC ---
+// Story Data
 const STORY_NODES: Record<string, ChatNode> = {
   'start': {
     id: 'start',
@@ -140,7 +140,7 @@ const STORY_NODES: Record<string, ChatNode> = {
       ],
       options: [
           { text: '🛡️ Defender: "Actividad de integración planificada."', nextNodeId: 'defense_shield', type: 'action' },
-          { text: '🤥 Venderlos: "Javi insistió, yo les dije que no."', nextNodeId: 'defense_betrayal', type: 'risky' }
+          { text: '🤥 Venderlos: "Javi insistió, yo les dije no."', nextNodeId: 'defense_betrayal', type: 'risky' }
       ],
       timeout: 10,
       timeoutNextNodeId: 'silence_guilt'
@@ -219,53 +219,6 @@ const STORY_NODES: Record<string, ChatNode> = {
   }
 };
 
-const AudioPlayer: React.FC = () => {
-    const [playing, setPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval>;
-        if (playing) {
-            interval = setInterval(() => {
-                setProgress(p => {
-                    if (p >= 100) {
-                        setPlaying(false);
-                        return 0;
-                    }
-                    return p + 2;
-                });
-            }, 100);
-        }
-        return () => clearInterval(interval);
-    }, [playing]);
-
-    return (
-        <div className="flex items-center gap-3 min-w-[220px] py-1 select-none">
-            <button 
-                onClick={() => setPlaying(!playing)}
-                className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-300 transition-colors"
-            >
-                {playing ? '⏸️' : '▶️'}
-            </button>
-            <div className="flex-1 flex flex-col gap-1">
-                <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 transition-all duration-100 ease-linear" style={{ width: `${progress}%` }}></div>
-                </div>
-                <div className="flex justify-between text-[10px] text-slate-400 font-mono">
-                    <span>0:{Math.floor(progress * 0.15).toString().padStart(2, '0')}</span>
-                    <span>0:15</span>
-                </div>
-            </div>
-            <div className="relative">
-                 <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200">
-                    <img src="https://ui-avatars.com/api/?name=Sofia+PO&background=random" alt="S" />
-                 </div>
-                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
-            </div>
-        </div>
-    )
-}
-
 const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
@@ -275,10 +228,7 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [reactions, setReactions] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  
-  // Modal State
   const [showGroupInfo, setShowGroupInfo] = useState(false);
-  // Reaction Picker State
   const [activeReactionId, setActiveReactionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -367,64 +317,49 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <div className="flex flex-col h-full bg-[#EFE7DE] relative font-sans overflow-hidden">
-      {/* HEADER */}
-      <div 
-        className="bg-[#008069] p-3 pt-safe text-white flex items-center shadow-md z-30 shrink-0 sticky top-0 cursor-pointer hover:bg-[#00705a] transition-colors"
-        onClick={() => setShowGroupInfo(true)}
-      >
-        <button onClick={(e) => { e.stopPropagation(); onBack(); }} className="mr-2 p-2 rounded-full hover:bg-white/20 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-        </button>
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mr-3 overflow-hidden border border-white/10">
-            <img src="https://ui-avatars.com/api/?name=Dyamanto+Devs&background=25D366&color=fff" alt="Group" className="w-full h-full object-cover"/>
-        </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="font-bold text-base leading-tight flex items-center gap-1 truncate">
-              Dyamanto Devs 💎
-              <span className="text-[10px] bg-white/20 px-1.5 rounded-full font-normal shrink-0">Info</span>
-          </h2>
-          <p className="text-xs text-green-100 truncate opacity-90">
-             {isTyping ? <span className="animate-pulse font-bold">{typingSender} está escribiendo...</span> : 'Toca para info del grupo'}
-          </p>
-        </div>
-      </div>
+      
+      {/* 1. Header (Sticky & Safe Area) */}
+      <ChatHeader 
+        title="Dyamanto Devs 💎"
+        subtitle={isTyping ? `${typingSender} está escribiendo...` : "Toca para info"}
+        avatarUrl="https://ui-avatars.com/api/?name=Dyamanto+Devs&background=25D366&color=fff"
+        onBack={onBack}
+        onInfo={() => setShowGroupInfo(true)}
+      />
 
-      {/* GROUP INFO MODAL */}
+      {/* 2. Group Info Modal (Overlay) */}
       {showGroupInfo && (
           <div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-end animate-fade-in" onClick={() => setShowGroupInfo(false)}>
-              <div className="w-full sm:w-4/5 h-full bg-[#F0F2F5] shadow-2xl animate-slide-up flex flex-col" onClick={e => e.stopPropagation()}>
-                  <div className="bg-white p-6 pt-10 flex flex-col items-center border-b border-slate-200">
-                      <div className="w-24 h-24 rounded-full bg-green-500 mb-4 flex items-center justify-center text-4xl shadow-lg">💎</div>
+              <div className="w-full sm:w-4/5 h-full bg-[#F0F2F5] shadow-2xl animate-slide-right flex flex-col pt-safe" onClick={e => e.stopPropagation()}>
+                  <div className="bg-white p-6 flex flex-col items-center border-b border-slate-200 mt-8 sm:mt-0">
+                      <div className="w-24 h-24 rounded-full bg-green-500 mb-4 flex items-center justify-center text-4xl shadow-lg ring-4 ring-green-100">💎</div>
                       <h2 className="text-xl font-black text-slate-800">Dyamanto Devs</h2>
-                      <p className="text-slate-500 text-xs mt-1">Grupo · 12 participantes</p>
+                      <p className="text-slate-500 text-xs mt-1 font-medium">Grupo · 12 participantes</p>
                   </div>
                   <div className="p-4 space-y-4 overflow-y-auto flex-1">
-                      <div className="bg-white p-4 rounded-xl shadow-sm">
+                      <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                           <h3 className="text-xs font-bold text-green-600 uppercase mb-2">Descripción</h3>
-                          <p className="text-sm text-slate-700 italic">"Lo que pasa en el deploy, queda en el deploy. Regla #1: No se habla de RRHH."</p>
+                          <p className="text-sm text-slate-700 italic leading-relaxed">"Lo que pasa en el deploy, queda en el deploy. Regla #1: No se habla de RRHH."</p>
                       </div>
                       
-                      <div className="bg-white p-4 rounded-xl shadow-sm space-y-4">
+                      <div className="bg-white p-4 rounded-2xl shadow-sm space-y-4 border border-slate-100">
                           <h3 className="text-xs font-bold text-green-600 uppercase">Miembros Clave</h3>
-                          
-                          <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">🎸</div>
+                          <div className="flex items-center gap-3 border-b border-slate-50 pb-2">
+                              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-lg">🎸</div>
                               <div>
                                   <p className="font-bold text-sm text-slate-800">Javi (Tech Lead)</p>
                                   <p className="text-xs text-slate-500">El rebelde. Odia la burocracia.</p>
                               </div>
                           </div>
-
-                          <div className="flex items-center gap-3">
-                               <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">🧠</div>
+                          <div className="flex items-center gap-3 border-b border-slate-50 pb-2">
+                               <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-lg">🧠</div>
                                <div>
                                   <p className="font-bold text-sm text-slate-800">Ana (Senior Dev)</p>
                                   <p className="text-xs text-slate-500">La pragmática. Media los conflictos.</p>
                                </div>
                           </div>
-
                           <div className="flex items-center gap-3">
-                               <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white">👔</div>
+                               <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white text-lg">👔</div>
                                <div>
                                   <p className="font-bold text-sm text-slate-800">Davide (CEO)</p>
                                   <p className="text-xs text-slate-500">Impredecible. Aparece cuando hay caos.</p>
@@ -432,134 +367,55 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                           </div>
                       </div>
                   </div>
-                  <button onClick={() => setShowGroupInfo(false)} className="m-4 mb-safe bg-[#008069] text-white py-3 rounded-xl font-bold">Cerrar</button>
+                  <button onClick={() => setShowGroupInfo(false)} className="m-4 mb-safe bg-[#008069] text-white py-3.5 rounded-xl font-bold active:scale-95 transition-transform shadow-md">Cerrar Info</button>
               </div>
           </div>
       )}
 
-      {/* CHAT AREA */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-fixed relative" onClick={() => setActiveReactionId(null)}>
-        
-        {chatHistory.map((msg, index) => {
-           const isMe = msg.role === 'hero';
-           const isSystem = msg.role === 'system';
-           const isCeo = msg.role === 'ceo';
-           
-           if (isSystem) {
-               return (
-                   <div key={`${msg.id}-${index}`} className="flex justify-center my-4 animate-fade-in">
-                       <div className="bg-[#E1F2FB] text-slate-700 border border-[#cce4f0] text-[10px] font-bold px-3 py-1 rounded-md text-center shadow-sm uppercase tracking-wide">
-                           {msg.text}
-                       </div>
-                   </div>
-               )
-           }
+      {/* 3. Chat History */}
+      <div 
+        className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-2 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-fixed relative" 
+        onClick={() => setActiveReactionId(null)}
+      >
+        <div className="flex flex-col justify-end min-h-full pb-2">
+             {chatHistory.map((msg, index) => (
+                 <MessageBubble 
+                    key={`${msg.id}-${index}`}
+                    msg={msg}
+                    isMe={msg.role === 'hero'}
+                    isSystem={msg.role === 'system'}
+                    isCeo={msg.role === 'ceo'}
+                    reaction={reactions[msg.id]}
+                    activeReactionId={activeReactionId}
+                    onToggleReaction={toggleReaction}
+                    onReactionClick={(id) => setActiveReactionId(activeReactionId === id ? null : id)}
+                    onCloseReaction={() => setActiveReactionId(null)}
+                 />
+             ))}
 
-           return (
-            <div key={`${msg.id}-${index}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-slide-up relative group items-end`}>
-                
-                {/* REACTION BUTTON (Smiley) */}
-                {!isSystem && (
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setActiveReactionId(activeReactionId === msg.id ? null : msg.id); }}
-                        className={`mb-2 mx-2 text-slate-400 hover:text-slate-600 transition-colors opacity-0 group-hover:opacity-100 ${activeReactionId === msg.id ? 'opacity-100' : ''}`}
-                    >
-                        <span className="text-lg">☺</span>
-                    </button>
-                )}
-
-                {/* REACTION POPUP */}
-                {activeReactionId === msg.id && (
-                     <div className={`absolute bottom-full mb-2 ${isMe ? 'right-0' : 'left-0'} z-20`}>
-                        <div className="bg-white rounded-full shadow-xl p-2 flex gap-2 animate-pop border border-slate-100">
-                             {['👍', '❤️', '😂', '🔥', '😡'].map(emoji => (
-                                <button 
-                                    key={emoji} 
-                                    onClick={(e) => { e.stopPropagation(); toggleReaction(msg.id, emoji); }} 
-                                    className="hover:scale-125 transition-transform text-2xl"
-                                >
-                                    {emoji}
-                                </button>
-                            ))}
+            {isTyping && (
+                <div className="flex justify-start animate-fade-in pl-2 mb-2">
+                    <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex gap-2 items-center border border-white/50">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{typingSender}</span>
+                        <div className="flex gap-1">
+                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></div>
+                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-150"></div>
                         </div>
-                    </div>
-                )}
-
-                {msg.type === 'sticker' ? (
-                     <div className="max-w-[160px] cursor-pointer relative" onDoubleClick={() => toggleReaction(msg.id, '❤️')}>
-                        <img src={msg.contentUrl} alt="Sticker" className="w-full h-auto drop-shadow-lg rounded-xl hover:scale-[1.02] transition-transform" />
-                         {reactions[msg.id] && (
-                            <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-md border border-slate-200 z-10 text-sm animate-pop">
-                                {reactions[msg.id]}
-                            </div>
-                        )}
-                     </div>
-                ) : (
-                    <div className={`
-                        max-w-[85%] px-3 py-2 text-sm relative shadow-sm border select-text
-                        ${isMe ? 'bg-[#D9FDD3] rounded-2xl rounded-tr-sm border-[#C0EBA6] text-slate-900' : 
-                          isCeo ? 'bg-[#111b21] text-[#e9edef] rounded-2xl rounded-tl-sm border-amber-900 border' : 
-                          'bg-white rounded-2xl rounded-tl-sm border-white text-slate-900'}
-                    `}>
-                        {!isMe && (
-                            <div className="flex justify-between items-center mb-0.5">
-                                <p className={`text-[11px] font-bold ${isCeo ? 'text-amber-400' : msg.role === 'dev' ? 'text-orange-600' : 'text-purple-700'}`}>
-                                    {msg.sender}
-                                    {isCeo && ' 👑'}
-                                </p>
-                            </div>
-                        )}
-                        
-                        {msg.type === 'image' && (
-                            <div className="mb-2 rounded-lg overflow-hidden bg-slate-100 mt-1 cursor-pointer">
-                                <img src={msg.contentUrl} className="w-full h-auto object-cover hover:opacity-90 transition-opacity" onError={(e) => {e.currentTarget.src = FALLBACK_IMG_URL}}/>
-                            </div>
-                        )}
-                        
-                        {msg.type === 'audio' ? (
-                            <AudioPlayer />
-                        ) : (
-                             <p className="leading-snug whitespace-pre-wrap relative z-10">{msg.text}</p>
-                        )}
-                        
-                        <div className={`flex justify-end items-center gap-1 mt-1 opacity-60 select-none text-[10px] ${isCeo ? 'text-slate-400' : 'text-slate-500'}`}>
-                            <span>10:{42 + index}</span>
-                            {isMe && <span className="text-[#53bdeb] font-bold">✓✓</span>}
-                        </div>
-
-                        {reactions[msg.id] && (
-                            <div className="absolute -bottom-3 right-0 bg-white rounded-full px-1.5 py-0.5 shadow-md border border-slate-100 z-10 text-[12px] animate-pop cursor-pointer hover:scale-110 transition-transform">
-                                {reactions[msg.id]}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-          );
-        })}
-        
-        {isTyping && (
-             <div className="flex justify-start animate-fade-in pl-2">
-                <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex gap-1 items-center">
-                    <span className="text-[10px] text-slate-400 font-bold mr-2 uppercase">{typingSender}</span>
-                    <div className="flex gap-1">
-                        <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
-                        <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></div>
-                        <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-150"></div>
                     </div>
                 </div>
-            </div>
-        )}
-        <div ref={scrollRef} className="h-4" />
+            )}
+            <div ref={scrollRef} className="h-0" />
+        </div>
       </div>
 
-      {/* INPUT AREA */}
-      <div className="bg-[#F0F2F5] p-2 flex flex-col items-center gap-2 shrink-0 z-20 pb-safe sticky bottom-0">
+      {/* 4. Input Area (Fixed Bottom) */}
+      <div className="bg-[#F0F2F5] p-2 sm:p-3 flex flex-col items-center gap-2 shrink-0 z-20 pb-safe sticky bottom-0 border-t border-slate-200">
         
         {timeLeft !== null && (
             <div className="w-full px-4 mb-1">
                 <div className="flex justify-between text-[10px] font-bold text-red-500 uppercase mb-1 animate-pulse">
-                    <span>Decisión Crítica</span>
+                    <span>⚠️ Decisión Crítica</span>
                     <span>{timeLeft}s</span>
                 </div>
                 <div className="w-full bg-red-100 h-1.5 rounded-full overflow-hidden">
@@ -572,35 +428,42 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         )}
 
         {showOptions && !isEnd && (
-             <div className="flex flex-col w-full gap-2 px-2">
+             <div className="flex flex-col w-full gap-2 px-1 max-w-lg">
                  {currentNode?.options?.map((opt, idx) => (
                      <button
                         key={idx}
                         onClick={() => handleOptionClick(opt.nextNodeId)}
                         className={`
-                            w-full py-3 px-4 rounded-2xl font-medium text-sm shadow-sm transition-all active:scale-95
+                            w-full py-3 px-4 rounded-xl font-medium text-sm shadow-[0_2px_0_rgba(0,0,0,0.05)] transition-all active:scale-[0.98]
                             text-left flex items-center group relative overflow-hidden border
-                            ${opt.type === 'risky' ? 'bg-red-50 text-red-900 border-red-200' : 
-                              opt.type === 'action' ? 'bg-amber-50 text-amber-900 border-amber-200' :
-                              'bg-white text-slate-800 border-slate-200'}
+                            ${opt.type === 'risky' ? 'bg-red-50 text-red-900 border-red-200 hover:bg-red-100' : 
+                              opt.type === 'action' ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100' :
+                              'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'}
                         `}
                      >
                          <span className={`
-                             w-6 h-6 rounded-full flex items-center justify-center mr-3 text-xs font-bold shrink-0
-                             ${opt.type === 'risky' ? 'bg-red-200 text-red-700' : 'bg-slate-100 text-slate-600'}
+                             w-6 h-6 rounded-lg flex items-center justify-center mr-3 text-[10px] font-bold shrink-0
+                             ${opt.type === 'risky' ? 'bg-red-200 text-red-700' : 'bg-slate-100 text-slate-500'}
                          `}>
                             {String.fromCharCode(65 + idx)}
                          </span>
-                         {opt.text}
+                         <span className="leading-tight">{opt.text}</span>
                      </button>
                  ))}
              </div>
         )}
 
         {isEnd && (
-            <button onClick={onBack} className="w-full mx-4 bg-[#008069] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#00705a] transition-colors">
+            <button onClick={onBack} className="w-full mx-4 bg-[#008069] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#00705a] transition-all active:scale-95 max-w-lg">
                 Volver al Home
             </button>
+        )}
+        
+        {!showOptions && !isEnd && (
+            <div className="w-full text-center py-2 text-xs text-slate-400 font-medium flex items-center justify-center gap-2">
+                <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-pulse"></span>
+                Esperando respuesta...
+            </div>
         )}
       </div>
     </div>

@@ -19,12 +19,15 @@
               }
             },
             spacing: {
-                'safe': 'env(safe-area-inset-bottom)',
+                'safe-top': 'env(safe-area-inset-top)',
+                'safe-bottom': 'env(safe-area-inset-bottom)',
+                'notch': '32px', // Simulated notch height
             },
             animation: {
               'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
               'fade-in': 'fadeIn 0.5s ease-out forwards',
               'slide-up': 'slideUp 0.3s ease-out forwards',
+              'slide-right': 'slideRight 0.3s ease-out forwards',
               'fall': 'fall 1s ease-in forwards',
               'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
@@ -46,6 +49,10 @@
                 '0%': { transform: 'translateY(20px)', opacity: '0' },
                 '100%': { transform: 'translateY(0)', opacity: '1' }
               },
+              slideRight: {
+                '0%': { transform: 'translateX(100%)' },
+                '100%': { transform: 'translateX(0)' }
+              },
               fall: {
                 '0%': { transform: 'translateY(0) rotate(0deg)', opacity: '1' },
                 '100%': { transform: 'translateY(600px) rotate(45deg)', opacity: '0' }
@@ -66,36 +73,48 @@
     <style>
       body {
         background-color: #0f172a;
-        background-image: radial-gradient(#1e293b 1px, transparent 1px);
-        background-size: 20px 20px;
         font-family: 'Inter', sans-serif;
         -webkit-tap-highlight-color: transparent;
         overscroll-behavior: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Prevent body scroll, handle inside containers */
       }
-      .scrollbar-hide::-webkit-scrollbar {
+      
+      /* GLOBAL SCROLLBAR HIDING */
+      *::-webkit-scrollbar {
           display: none;
       }
-      .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+      * {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
       }
+
       .glass {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
       }
+      
       /* Phone Frame for Desktop */
       .phone-frame {
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        border-radius: 40px;
+        box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+        border-radius: 48px;
+        border: 12px solid #1e293b;
       }
-      /* Safe Area Utilities */
+
+      /* Utilities for Safe Areas */
       .pb-safe {
-          padding-bottom: env(safe-area-inset-bottom);
+          padding-bottom: env(safe-area-inset-bottom, 20px);
       }
       .pt-safe {
-          padding-top: env(safe-area-inset-top);
+          padding-top: max(env(safe-area-inset-top), 32px); /* Minimum 32px for notch */
+      }
+      
+      /* Custom Text Selection */
+      ::selection {
+        background: rgba(79, 70, 229, 0.3);
       }
     </style>
   <script type="importmap">
