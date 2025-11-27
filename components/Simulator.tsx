@@ -207,6 +207,11 @@ interface SimulatorProps {
     setGlobalStability: (val: number | ((prev: number) => number)) => void;
     setGlobalMorale: (val: number | ((prev: number) => number)) => void;
     unlockBadge: (id: string) => void;
+    // New Props for Persistence & Cross App
+    simState: { isActive: boolean; levelIndex: number; streak: number; waitingForMail: boolean; mailEventCompleted: boolean };
+    setSimState: React.Dispatch<React.SetStateAction<{ isActive: boolean; levelIndex: number; streak: number; waitingForMail: boolean; mailEventCompleted: boolean }>>;
+    onTriggerMail: () => void;
+    onNavigateToMail: () => void;
 }
 
 const Simulator: React.FC<SimulatorProps> = ({ 
@@ -215,9 +220,14 @@ const Simulator: React.FC<SimulatorProps> = ({
     globalMorale, 
     setGlobalStability, 
     setGlobalMorale,
-    unlockBadge 
+    unlockBadge,
+    simState,
+    setSimState,
+    onTriggerMail,
+    onNavigateToMail
 }) => {
-  const [levelIndex, setLevelIndex] = useState(0);
+  const { levelIndex, streak, waitingForMail, mailEventCompleted } = simState;
+  
   const [gameState, setGameState] = useState<GameState>(GameState.INTRO);
   const [feedback, setFeedback] = useState<string>("");
   const [theory, setTheory] = useState<string>("");
@@ -225,7 +235,6 @@ const Simulator: React.FC<SimulatorProps> = ({
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastImpact, setLastImpact] = useState<{stability: number, morale: number}>({stability: 0, morale: 0});
   const [hintUsed, setHintUsed] = useState(false);
-  const [streak, setStreak] = useState(0);
   const [randomEvent, setRandomEvent] = useState<{text: string, impact: number} | null>(null);
 
   const trajectories = useMemo(() => {
@@ -245,7 +254,12 @@ const Simulator: React.FC<SimulatorProps> = ({
   };
 
   useEffect(() => {
-    if (showFeedback || gameState === GameState.INTRO) return;
+    // Sync state on mount if game was active
+    if (simState.isActive) setGameState(GameState.PLAYING);
+  }, []);
+
+  useEffect(() => {
+    if (showFeedback || gameState === GameState.INTRO || waitingForMail) return;
 
     if (globalStability <= 0 || globalMorale <= 0) {
         if (gameState !== GameState.COLLAPSING && gameState !== GameState.LOST) {
@@ -259,7 +273,7 @@ const Simulator: React.FC<SimulatorProps> = ({
         if (globalStability > 80) unlockBadge('ARCHITECT');
         if (streak > 4) unlockBadge('CONSISTENT');
     }
-  }, [globalStability, globalMorale, levelIndex, showFeedback, gameState, streak]);
+  }, [globalStability, globalMorale, levelIndex, showFeedback, gameState, streak, waitingForMail]);
 
   const handleChoice = (optionIndex: number) => {
     if (!currentLevel) return;
@@ -267,13 +281,10 @@ const Simulator: React.FC<SimulatorProps> = ({
     setLastImpact({ stability: selected.stabilityImpact, morale: selected.moraleImpact });
     
     if (selected.stabilityImpact > 0 && selected.moraleImpact > 0) {
-        setStreak(s => {
-            const newStreak = s + 1;
-            if (newStreak === 3) unlockBadge('MOMENTUM');
-            return newStreak;
-        });
+        setSimState(prev => ({ ...prev, streak: prev.streak + 1 }));
+        if (streak + 1 === 3) unlockBadge('MOMENTUM');
     } else {
-        setStreak(0);
+        setSimState(prev => ({ ...prev, streak: 0 }));
     }
 
     // Specific Badge Logic based on Level ID and Choice
@@ -295,10 +306,16 @@ const Simulator: React.FC<SimulatorProps> = ({
     setHintUsed(false);
     if (globalStability <= 0 || globalMorale <= 0) return;
 
+    // Trigger MAIL event at level 2 randomly, ONLY if not already done
+    if (levelIndex === 2 && !mailEventCompleted && Math.random() > 0.3) {
+        onTriggerMail();
+        return;
+    }
+
     if (Math.random() > 0.8 && levelIndex < GAME_LEVELS.length - 1) {
          triggerRandomEvent();
     } else {
-         setLevelIndex(prev => prev + 1);
+         setSimState(prev => ({ ...prev, levelIndex: prev.levelIndex + 1 }));
     }
   };
 
@@ -321,14 +338,13 @@ const Simulator: React.FC<SimulatorProps> = ({
   const nextLevelDirect = () => {
       setRandomEvent(null);
       setGameState(GameState.PLAYING);
-      setLevelIndex(prev => prev + 1);
+      setSimState(prev => ({ ...prev, levelIndex: prev.levelIndex + 1 }));
   };
 
   const restart = () => {
-      setLevelIndex(0);
+      setSimState({ isActive: true, levelIndex: 0, streak: 0, waitingForMail: false, mailEventCompleted: false });
       setGlobalStability(100);
       setGlobalMorale(90); 
-      setStreak(0);
       setGameState(GameState.INTRO);
       setShowFeedback(false);
       setHintUsed(false);
@@ -364,7 +380,7 @@ const Simulator: React.FC<SimulatorProps> = ({
                 transform: isCollapsing 
                     ? 'translateY(100px)' 
                     : `rotate(${tiltAngle}deg) scale(${1 + (100-globalStability)*0.002}) translateY(${gameState === GameState.PLAYING ? '-10%' : '0'})`, 
-                opacity: (gameState === GameState.INTRO || gameState === GameState.EVENT) ? 0.3 : 1
+                opacity: (gameState === GameState.INTRO || gameState === GameState.EVENT || waitingForMail) ? 0.3 : 1
             }}
         >
             <div className={`h-6 w-full -ml-[2%] bg-slate-800 rounded-lg mb-2 shadow-2xl border-t border-slate-600 transition-opacity duration-300 ${isCollapsing ? 'opacity-0' : 'opacity-100'}`}></div>
@@ -382,6 +398,32 @@ const Simulator: React.FC<SimulatorProps> = ({
         </div>
       </div>
 
+      {/* --- MAIL INTERRUPT OVERLAY --- */}
+      {waitingForMail && (
+           <div className="absolute inset-0 z-40 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 animate-fade-in">
+               <div className="bg-white text-slate-900 p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center">
+                   <div className="text-5xl mb-4">📧</div>
+                   <h2 className="text-xl font-black mb-2">¡AUDITORÍA SORPRESA!</h2>
+                   <p className="text-sm text-slate-600 mb-6">Los inversores han enviado un correo urgente. El simulador está pausado hasta que respondas.</p>
+                   <button 
+                        onClick={onNavigateToMail}
+                        className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+                    >
+                       Ir a Mail
+                   </button>
+               </div>
+           </div>
+      )}
+
+      {/* --- POST-MAIL SUCCESS TOAST --- */}
+      {mailEventCompleted && !waitingForMail && levelIndex === 2 && (
+          <div className="absolute top-24 z-30 animate-pop">
+              <div className="bg-emerald-500 text-white px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center gap-2">
+                  <span>✅</span> Auditoría Resuelta
+              </div>
+          </div>
+      )}
+
       <div className="w-full flex justify-center items-end pb-safe z-30 shrink-0 relative px-4 mb-4">
          <SimulatorCard 
             gameState={gameState}
@@ -398,7 +440,7 @@ const Simulator: React.FC<SimulatorProps> = ({
             lastImpact={lastImpact}
             levelIndex={levelIndex}
             totalLevels={GAME_LEVELS.length}
-            onStart={() => setGameState(GameState.PLAYING)}
+            onStart={() => { setSimState(s => ({ ...s, isActive: true })); setGameState(GameState.PLAYING); }}
             onChoice={handleChoice}
             onNext={nextLevel}
             onContinue={nextLevelDirect}

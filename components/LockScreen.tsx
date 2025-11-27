@@ -3,15 +3,24 @@ import React, { useState, useEffect } from 'react';
 const LockScreen: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
   const [time, setTime] = useState(new Date());
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const [isFlashlightOn, setIsFlashlightOn] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const handleUnlock = () => {
+  const handleUnlock = (e: React.MouseEvent) => {
+    // Prevent unlock if clicking tool buttons
+    if ((e.target as HTMLElement).closest('button')) return;
+    
     setIsUnlocking(true);
-    setTimeout(onUnlock, 400); // Wait for animation
+    setTimeout(onUnlock, 400); 
+  };
+
+  const toggleFlashlight = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsFlashlightOn(!isFlashlightOn);
   };
 
   return (
@@ -21,10 +30,12 @@ const LockScreen: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
         ${isUnlocking ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
         style={{ backgroundImage: "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')" }}
     >
+        {/* Flashlight Overlay */}
+        <div className={`absolute inset-0 bg-white mix-blend-overlay pointer-events-none transition-opacity duration-200 ${isFlashlightOn ? 'opacity-90' : 'opacity-0'}`}></div>
         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
 
         {/* Lock Icon */}
-        <div className="flex flex-col items-center animate-fade-in w-full px-6">
+        <div className="flex flex-col items-center animate-fade-in w-full px-6 relative z-10">
             <div className="text-white/80 mb-4 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
                 Dyamanto Locked
@@ -64,19 +75,22 @@ const LockScreen: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
         </div>
 
         {/* Bottom Actions */}
-        <div className="w-full px-12 flex justify-between items-end mb-4 animate-slide-up relative z-10">
-            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xl shadow-lg transition-transform active:scale-90">
+        <div className="w-full px-12 flex justify-between items-end mb-4 animate-slide-up relative z-20">
+            <button 
+                onClick={toggleFlashlight}
+                className={`w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center text-white text-xl shadow-lg transition-all active:scale-90 ${isFlashlightOn ? 'bg-white text-black' : 'bg-white/20'}`}
+            >
                 🔦
-            </div>
+            </button>
             
-            <div className="flex flex-col items-center gap-2 opacity-80">
+            <div className="flex flex-col items-center gap-2 opacity-80 pointer-events-none">
                  <p className="text-[10px] uppercase font-bold tracking-widest text-white/70 animate-pulse">Touch to Unlock</p>
                  <div className="w-32 h-1 bg-white/50 rounded-full"></div>
             </div>
 
-            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xl shadow-lg transition-transform active:scale-90">
+            <button className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xl shadow-lg transition-transform active:scale-90">
                 📷
-            </div>
+            </button>
         </div>
     </div>
   );

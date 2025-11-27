@@ -200,6 +200,14 @@ const STORY_NODES: Record<string, ChatNode> = {
           { id: 'lf2', role: 'system', sender: 'Feedback', text: 'La falta de integridad o el autoritarismo destruyeron tu liderazgo.', delay: 1500 }
       ]
   },
+  'post_call_silence': {
+      id: 'post_call_silence',
+      messages: [
+          { id: 'pcs1', role: 'system', sender: 'System', text: 'Llamada finalizada.', delay: 500 },
+          { id: 'pcs2', role: 'dev', sender: 'Javi', text: 'Uff... eso sonó mal.', delay: 1500 },
+          { id: 'pcs3', role: 'system', sender: 'System', text: '🚫 Te han eliminado del grupo.', delay: 2500 }
+      ]
+  },
   'quiz_time': {
       id: 'quiz_time',
       messages: [{ id: 'qt1', role: 'hero', sender: 'Tú', text: '¿Teoría X o Y?', delay: 500 }],
@@ -222,25 +230,39 @@ const STORY_NODES: Record<string, ChatNode> = {
   }
 };
 
-const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, onTriggerCall: (name: string) => void }> = ({ onBack, unlockBadge, onTriggerCall }) => {
-  const [currentNodeId, setCurrentNodeId] = useState<string>('start');
-  const [chatHistory, setChatHistory] = useState<Message[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [typingSender, setTypingSender] = useState('');
+interface LeaksProps {
+    onBack: () => void;
+    unlockBadge: (id: string) => void;
+    onTriggerCall: (name: string) => void;
+    chatState: { currentNodeId: string; history: Message[]; isTyping: boolean; completedNodes: string[] };
+    setChatState: React.Dispatch<React.SetStateAction<{ currentNodeId: string; history: Message[]; isTyping: boolean; completedNodes: string[] }>>;
+}
+
+const Leaks: React.FC<LeaksProps> = ({ onBack, unlockBadge, onTriggerCall, chatState, setChatState }) => {
+  const { currentNodeId, history, isTyping, completedNodes } = chatState;
+  
   const [showOptions, setShowOptions] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [reactions, setReactions] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [activeReactionId, setActiveReactionId] = useState<string | null>(null);
+  const [typingSender, setTypingSender] = useState('');
   
   // Game State inside Chat
   const [stressLevel, setStressLevel] = useState(20);
   const [groupName, setGroupName] = useState("Dyamanto Devs 💎");
 
+  // Effect to process current node (ONLY if not already completed)
   useEffect(() => {
     const node = STORY_NODES[currentNodeId];
     if (!node) return;
+
+    if (completedNodes.includes(currentNodeId)) {
+        // Just show options if available
+        if (!node.autoNext) setShowOptions(true);
+        return;
+    }
 
     // --- LOGRO & EVENT TRIGGERS ---
     if (currentNodeId === 'gaming_accepted') unlockBadge('GAMER');
@@ -270,22 +292,25 @@ const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, o
     setTimeLeft(null);
 
     node.messages.forEach((msg) => {
+      // Skip messages already in history to avoid duplication
+      if (history.some(m => m.id === msg.id)) return;
+
       const msgDelay = msg.delay || 1000;
       const typingStart = accumulatedDelay;
       accumulatedDelay += msgDelay;
 
       timeouts.push(setTimeout(() => {
-        setIsTyping(true);
+        setChatState(prev => ({ ...prev, isTyping: true }));
         setTypingSender(msg.sender);
         scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, typingStart));
 
       timeouts.push(setTimeout(() => {
-        setIsTyping(false);
-        setChatHistory(prev => {
-            if (prev.some(m => m.id === msg.id)) return prev;
-            return [...prev, msg];
-        });
+        setChatState(prev => ({ 
+            ...prev, 
+            isTyping: false,
+            history: [...prev.history, msg]
+        }));
 
         if (msg.triggerReaction) {
             setTimeout(() => {
@@ -298,8 +323,10 @@ const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, o
     });
 
     timeouts.push(setTimeout(() => {
+        setChatState(prev => ({ ...prev, completedNodes: [...prev.completedNodes, currentNodeId] }));
+        
         if (node.autoNext) {
-            setCurrentNodeId(node.autoNext);
+            setChatState(prev => ({ ...prev, currentNodeId: node.autoNext! }));
         } else {
             setShowOptions(true);
             if (node.timeout && node.timeoutNextNodeId) {
@@ -310,7 +337,12 @@ const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, o
     }, accumulatedDelay + 500));
 
     return () => timeouts.forEach(clearTimeout);
-  }, [currentNodeId]);
+  }, [currentNodeId, completedNodes]); // Removed history dependency to avoid loops
+
+  useEffect(() => {
+      // Scroll to bottom on mount
+      setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+  }, []);
 
   useEffect(() => {
       if (timeLeft === null || timeLeft <= 0) return;
@@ -329,7 +361,7 @@ const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, o
   const handleOptionClick = (nextNodeId: string) => {
     setTimeLeft(null);
     setShowOptions(false);
-    setCurrentNodeId(nextNodeId);
+    setChatState(prev => ({ ...prev, currentNodeId: nextNodeId }));
   };
 
   const toggleReaction = (msgId: string, emoji: string) => {
@@ -341,7 +373,7 @@ const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, o
   };
 
   const currentNode = STORY_NODES[currentNodeId];
-  const isEnd = currentNodeId.startsWith('win') || currentNodeId.startsWith('lose');
+  const isEnd = currentNodeId.startsWith('win') || (currentNodeId.startsWith('lose') && currentNodeId !== 'lose_fired') || currentNodeId === 'post_call_silence';
 
   return (
     <div className="flex flex-col h-full bg-[#EFE7DE] relative font-sans overflow-hidden">
@@ -420,7 +452,7 @@ const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, o
         onClick={() => setActiveReactionId(null)}
       >
         <div className="flex flex-col justify-end min-h-full pb-2">
-             {chatHistory.map((msg, index) => (
+             {history.map((msg, index) => (
                  <MessageBubble 
                     key={`${msg.id}-${index}`}
                     msg={msg}
@@ -501,7 +533,7 @@ const Leaks: React.FC<{ onBack: () => void, unlockBadge: (id: string) => void, o
             </button>
         )}
         
-        {!showOptions && !isEnd && (
+        {!showOptions && !isEnd && !isTyping && (
             <div className="w-full text-center py-2 text-xs text-slate-400 font-medium flex items-center justify-center gap-2">
                 <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-pulse"></span>
                 Esperando respuesta...

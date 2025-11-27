@@ -27,49 +27,84 @@ export const AppHeader: React.FC<{ title?: string, onBack: () => void, color?: s
 );
 
 // --- MAIL APP ---
-export const MailApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-    <AppWrapper onBack={onBack}>
-        <AppHeader 
-            title="Inbox (1)" 
-            onBack={onBack} 
-            rightElement={<button className="text-blue-500 font-bold text-sm">Edit</button>}
-        />
-        <div className="flex-1 overflow-y-auto">
-            <h3 className="font-bold text-slate-900 text-lg px-4 py-2">Dyamanto Corp</h3>
-            <div className="bg-white border-t border-b border-slate-200">
-                <div className="p-4 flex gap-3 border-b border-slate-100 relative group active:bg-slate-50 transition-colors cursor-pointer">
-                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full mt-2 shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-baseline mb-1">
-                            <h3 className="font-bold text-slate-900 text-sm">RRHH Global</h3>
-                            <span className="text-xs text-slate-400">Yesterday</span>
+export const MailApp: React.FC<{ onBack: () => void, inbox?: any[], onReply?: (choice: 'cut' | 'invest') => void }> = ({ onBack, inbox, onReply }) => {
+    const [selectedMail, setSelectedMail] = useState<any | null>(null);
+
+    const handleReply = (choice: 'cut' | 'invest') => {
+        if (onReply) onReply(choice);
+        setSelectedMail(null);
+    };
+
+    return (
+        <AppWrapper onBack={onBack}>
+            {selectedMail ? (
+                <div className="flex-1 flex flex-col bg-white">
+                    <AppHeader onBack={() => setSelectedMail(null)} />
+                    <div className="px-5 py-2 border-b border-slate-100">
+                        <h2 className="text-xl font-bold leading-tight mb-2">{selectedMail.subject}</h2>
+                        <div className="flex justify-between items-center text-xs text-slate-500">
+                            <span className="font-bold text-slate-800">{selectedMail.sender}</span>
+                            <span>{selectedMail.time}</span>
                         </div>
-                        <p className="text-sm font-medium text-slate-800 mb-1">Nueva Política de Registro de Horas</p>
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                            Estimado equipo, para mejorar la eficiencia del proyecto "Apex", a partir de hoy se requerirá un log de actividad detallado...
-                        </p>
                     </div>
+                    <div className="p-5 text-sm text-slate-800 leading-relaxed whitespace-pre-line flex-1">
+                        {selectedMail.isInteractive ? (
+                            <>
+                                Estimado CEO,
+                                
+                                Hemos notado un aumento en el "Burn Rate". Necesitamos una acción inmediata para asegurar la próxima ronda de inversión.
+                                
+                                Tienes dos opciones:
+                                1. Recortar beneficios (Fruta, Café, Eventos). Ahorra dinero pero daña la moral.
+                                2. Invertir en Marketing. Arriesgado financieramente pero motiva el crecimiento.
+                                
+                                Esperamos su respuesta ASAP.
+                                
+                                - The Board
+                            </>
+                        ) : (
+                            selectedMail.body || "Contenido del correo no disponible."
+                        )}
+                    </div>
+                    {selectedMail.isInteractive && !selectedMail.read && (
+                         <div className="p-4 bg-slate-50 border-t border-slate-200 flex gap-3 pb-safe">
+                             <button onClick={() => handleReply('cut')} className="flex-1 bg-white border border-slate-200 text-red-600 font-bold py-3 rounded-xl shadow-sm active:scale-95">✂️ Recortar</button>
+                             <button onClick={() => handleReply('invest')} className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md active:scale-95">📈 Invertir</button>
+                         </div>
+                    )}
                 </div>
-                <div className="p-4 flex gap-3 opacity-60">
-                    <div className="w-2.5 h-2.5 mt-2 shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-baseline mb-1">
-                            <h3 className="font-bold text-slate-900 text-sm">Javi (Tech Lead)</h3>
-                            <span className="text-xs text-slate-400">Friday</span>
+            ) : (
+                <>
+                    <AppHeader 
+                        title="Inbox" 
+                        onBack={onBack} 
+                        rightElement={<button className="text-blue-500 font-bold text-sm">Edit</button>}
+                    />
+                    <div className="flex-1 overflow-y-auto">
+                        <h3 className="font-bold text-slate-900 text-lg px-4 py-2">Dyamanto Corp</h3>
+                        <div className="bg-white border-t border-b border-slate-200">
+                            {inbox?.map((mail, i) => (
+                                <div key={i} onClick={() => setSelectedMail(mail)} className={`p-4 flex gap-3 border-b border-slate-100 relative group active:bg-slate-50 transition-colors cursor-pointer ${!mail.read ? 'bg-blue-50/30' : ''}`}>
+                                    <div className={`w-2.5 h-2.5 rounded-full mt-2 shrink-0 ${!mail.read ? 'bg-blue-500' : 'bg-transparent'}`}></div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-baseline mb-1">
+                                            <h3 className={`font-bold text-sm ${!mail.read ? 'text-slate-900' : 'text-slate-700'}`}>{mail.sender}</h3>
+                                            <span className="text-xs text-slate-400">{mail.time}</span>
+                                        </div>
+                                        <p className="text-sm font-medium text-slate-800 mb-1 truncate">{mail.subject}</p>
+                                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                                            {mail.body ? mail.body.substring(0, 60) + "..." : (mail.isInteractive ? "URGENT: Action Required..." : "Click to read more...")}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <p className="text-sm font-medium text-slate-800 mb-1">Re: Servidor AWS Caído</p>
-                        <p className="text-xs text-slate-500 line-clamp-2">
-                            Ya levanté la instancia. Fue un error de configuración en el load balancer. No se preocupen.
-                        </p>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div className="p-3 bg-slate-100 border-t border-slate-200 text-center text-xs text-slate-500 pb-safe">
-            Updated Just Now
-        </div>
-    </AppWrapper>
-);
+                </>
+            )}
+        </AppWrapper>
+    );
+};
 
 // --- BROWSER APP ---
 export const BrowserApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
@@ -150,7 +185,7 @@ export const BrowserApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             </button>
             <button className="hover:scale-110 transition-transform">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h.01"/><path d="M19.07 4.93L17 9h-4l2.07-4.07A2 2 0 0 1 17 3a2 2 0 0 1 2.07 1.93z"/><path d="M22 13h-4v-2a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2H2"/></svg>
+                <svg width="20" height="20" viewBox="0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h.01"/><path d="M19.07 4.93L17 9h-4l2.07-4.07A2 2 0 0 1 17 3a2 2 0 0 1 2.07 1.93z"/><path d="M22 13h-4v-2a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2H2"/></svg>
             </button>
             <button className="hover:scale-110 transition-transform">
                 <svg width="18" height="18" viewBox="0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="4" ry="4"/></svg>
@@ -450,6 +485,13 @@ export const BADGES = {
         desc: 'Resolviste una crisis de liderazgo sin despedir a nadie.',
         criteria: 'En Leaks, logra que Javi se quede y admita su error.',
         rarity: 'Épico'
+    },
+    'CFO_MINDSET': {
+        title: 'CFO Mindset',
+        icon: '💰',
+        desc: 'Tomaste decisiones financieras difíciles ante la presión de los inversores.',
+        criteria: 'En la auditoría de Mail, recorta el presupuesto.',
+        rarity: 'Raro'
     }
 };
 
@@ -540,7 +582,7 @@ export const AwardsApp: React.FC<{ onBack: () => void, unlockedBadges: string[] 
 };
 
 // --- PHONE APP ---
-export const PhoneApp: React.FC<{ onBack: () => void, initialIncomingCall?: string | null }> = ({ onBack, initialIncomingCall }) => {
+export const PhoneApp: React.FC<{ onBack: () => void, initialIncomingCall?: string | null, onCallEnded?: () => void }> = ({ onBack, initialIncomingCall, onCallEnded }) => {
     const [calling, setCalling] = useState<string | null>(initialIncomingCall || null);
     
     // Auto answer simulation if incoming call is active
@@ -556,15 +598,16 @@ export const PhoneApp: React.FC<{ onBack: () => void, initialIncomingCall?: stri
     const handleAcceptCall = () => {
         setIncomingState('connected');
         setTimeout(() => {
-            // Fake conversation end
             setIncomingState('ended');
             setCalling(null);
+            if (onCallEnded) setTimeout(onCallEnded, 500); // Trigger OS callback
         }, 3000);
     };
 
     const handleDeclineCall = () => {
         setIncomingState('ended');
         setCalling(null);
+        if (onCallEnded) setTimeout(onCallEnded, 200);
     };
 
     return (
@@ -592,7 +635,7 @@ export const PhoneApp: React.FC<{ onBack: () => void, initialIncomingCall?: stri
                                 <button onClick={handleAcceptCall} className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 active:scale-95 transition-all animate-bounce">📞</button>
                             </>
                          ) : (
-                             <button onClick={() => setCalling(null)} className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-red-600 active:scale-95 transition-all">📞</button>
+                             <button onClick={() => { setCalling(null); if(onCallEnded) onCallEnded(); }} className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-red-600 active:scale-95 transition-all">📞</button>
                          )}
                     </div>
                 </div>
