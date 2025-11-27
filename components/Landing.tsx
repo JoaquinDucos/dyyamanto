@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface LandingProps {
@@ -57,7 +56,7 @@ const Landing: React.FC<LandingProps> = ({ onNavigate, stability, morale }) => {
             <AppIcon icon="⚙️" label="Settings" gradient="bg-gradient-to-br from-slate-500 to-slate-700" onClick={() => onNavigate('settings')} />
             
             <AppIcon icon="📅" label="Calendar" gradient="glass" onClick={() => onNavigate('calendar')} />
-            <AppIcon icon="📸" label="Photos" gradient="glass" onClick={() => onNavigate('photos')} />
+            <AppIcon icon="🏆" label="Logros" gradient="bg-gradient-to-br from-yellow-400 to-orange-500" onClick={() => onNavigate('awards')} />
             <AppIcon icon="☁️" label="Weather" gradient="glass" onClick={() => onNavigate('weather')} />
             <AppIcon icon="⏰" label="Clock" gradient="glass" onClick={() => onNavigate('clock')} />
         </div>

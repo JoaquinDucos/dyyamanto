@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 // --- SHARED WRAPPER ---
@@ -204,6 +203,155 @@ export const CalendarApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
     </AppWrapper>
 );
 
+// --- AWARDS APP (NEW) ---
+export const BADGES = {
+    'SURVIVOR': { 
+        title: 'Survivor', 
+        icon: '🏆', 
+        desc: 'Completaste la simulación sin que la empresa colapse.', 
+        criteria: 'Llega al final de todos los niveles del Simulador.',
+        rarity: 'Común' 
+    },
+    'PEOPLE_FIRST': { 
+        title: 'People First', 
+        icon: '❤️', 
+        desc: 'Priorizaste a las personas sobre los procesos de forma consistente.', 
+        criteria: 'Termina el simulador con la Moral > 80%.',
+        rarity: 'Raro' 
+    },
+    'ARCHITECT': { 
+        title: 'Arquitecto', 
+        icon: '🏗️', 
+        desc: 'Construiste cimientos sólidos y escalables.', 
+        criteria: 'Termina el simulador con la Estabilidad > 80%.',
+        rarity: 'Raro' 
+    },
+    'SERVANT_LEADER': { 
+        title: 'Servant Leader', 
+        icon: '🛡️', 
+        desc: 'Protegiste al equipo del burnout asumiendo el costo político.', 
+        criteria: 'En el nivel "Crisis de Burnout", elige recortar el alcance.',
+        rarity: 'Épico' 
+    },
+    'CULTURE_GUARD': { 
+        title: 'Culture Guard', 
+        icon: '⚔️', 
+        desc: 'No toleraste toxicidad, incluso de un alto performer.', 
+        criteria: 'Despide al "Rockstar" tóxico inmediatamente.',
+        rarity: 'Legendario' 
+    },
+    'TRANSPARENCY': { 
+        title: 'Glass House', 
+        icon: '🪟', 
+        desc: 'Hiciste públicos los salarios. Transparencia radical.', 
+        criteria: 'Elige "Nivelación Pública" en la crisis de salarios.',
+        rarity: 'Legendario' 
+    },
+    'MOMENTUM': { 
+        title: 'Momentum', 
+        icon: '🔥', 
+        desc: 'Lograste una racha perfecta de decisiones coherentes.', 
+        criteria: 'Acierta 3 decisiones seguidas que suban tanto Moral como Estabilidad.',
+        rarity: 'Común' 
+    },
+    'CHAOS_MANAGER': { 
+        title: 'Chaos Manager', 
+        icon: '🌀', 
+        desc: 'Navegaste la incertidumbre de un evento aleatorio.', 
+        criteria: 'Sobrevive a cualquier evento aleatorio en el simulador.',
+        rarity: 'Común' 
+    },
+    'CONSISTENT': { 
+        title: 'Consistencia', 
+        icon: '💎', 
+        desc: 'Demostraste un liderazgo sólido y predecible.', 
+        criteria: 'Mantén una racha positiva (Streak) mayor a 4.',
+        rarity: 'Épico' 
+    }
+};
+
+export const AwardsApp: React.FC<{ onBack: () => void, unlockedBadges: string[] }> = ({ onBack, unlockedBadges }) => {
+    const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
+
+    const activeBadge = selectedBadge ? BADGES[selectedBadge as keyof typeof BADGES] : null;
+    const isUnlocked = selectedBadge && unlockedBadges.includes(selectedBadge);
+
+    return (
+        <AppWrapper bg="bg-slate-900" onBack={onBack} darkStatus>
+            <AppHeader title="Logros" onBack={onBack} light color="text-yellow-400" />
+            <div className="px-4 pb-4">
+                 <h1 className="text-3xl font-black text-white mb-1">Hall of Fame</h1>
+                 <p className="text-slate-400 text-xs">Toca una medalla para ver cómo ganarla.</p>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto px-4 pb-20 grid grid-cols-2 gap-4">
+                {Object.entries(BADGES).map(([id, badge]) => {
+                    const unlocked = unlockedBadges.includes(id);
+                    return (
+                        <button 
+                            key={id} 
+                            onClick={() => setSelectedBadge(id)}
+                            className={`aspect-square rounded-3xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden border transition-all active:scale-95 ${unlocked ? 'bg-slate-800 border-yellow-500/30 shadow-lg shadow-yellow-900/20' : 'bg-slate-800/50 border-white/5 opacity-60 hover:opacity-80'}`}
+                        >
+                            {unlocked && <div className="absolute inset-0 bg-gradient-to-tr from-yellow-500/10 to-transparent pointer-events-none"></div>}
+                            <div className={`text-4xl mb-3 transition-transform duration-500 ${unlocked ? 'scale-110 filter drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]' : 'grayscale blur-[1px]'}`}>
+                                {badge.icon}
+                            </div>
+                            <h3 className={`font-bold text-sm mb-1 ${unlocked ? 'text-white' : 'text-slate-500'}`}>{badge.title}</h3>
+                            {unlocked ? (
+                                <span className="text-[9px] font-bold text-green-400 uppercase tracking-wider">Desbloqueado</span>
+                            ) : (
+                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Bloqueado</span>
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* DETAIL MODAL */}
+            {selectedBadge && activeBadge && (
+                <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-fade-in" onClick={() => setSelectedBadge(null)}>
+                    <div className="bg-[#1c1c1e] w-full max-w-sm rounded-[2rem] p-8 relative shadow-2xl border border-white/10 animate-slide-up" onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setSelectedBadge(null)} className="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white">✕</button>
+                        
+                        <div className="flex flex-col items-center text-center">
+                            <div className={`text-7xl mb-6 ${isUnlocked ? 'animate-bounce filter drop-shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'grayscale opacity-50'}`}>
+                                {activeBadge.icon}
+                            </div>
+                            <h2 className={`text-2xl font-black mb-2 ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>
+                                {activeBadge.title}
+                            </h2>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest mb-6 border ${
+                                activeBadge.rarity === 'Legendario' ? 'bg-purple-900/50 text-purple-300 border-purple-500/50' : 
+                                activeBadge.rarity === 'Épico' ? 'bg-indigo-900/50 text-indigo-300 border-indigo-500/50' :
+                                'bg-slate-700 text-slate-300 border-slate-600'
+                            }`}>
+                                {activeBadge.rarity}
+                            </span>
+
+                            <div className="bg-black/30 rounded-2xl p-4 w-full mb-4 border border-white/5">
+                                <p className="text-xs text-slate-400 uppercase font-bold mb-2">Descripción</p>
+                                <p className="text-sm text-white/90 leading-relaxed">
+                                    {isUnlocked ? activeBadge.desc : '??? (Desbloquea para ver)'}
+                                </p>
+                            </div>
+
+                            <div className={`rounded-2xl p-4 w-full border ${isUnlocked ? 'bg-green-900/20 border-green-500/30' : 'bg-red-900/20 border-red-500/30'}`}>
+                                <p className={`text-xs uppercase font-bold mb-2 ${isUnlocked ? 'text-green-400' : 'text-red-400'}`}>
+                                    {isUnlocked ? '¡Completado!' : 'Cómo ganar'}
+                                </p>
+                                <p className={`text-sm leading-relaxed ${isUnlocked ? 'text-green-100' : 'text-red-100 font-medium'}`}>
+                                    {activeBadge.criteria}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </AppWrapper>
+    );
+};
+
 // --- PHOTOS APP ---
 export const PhotosApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
     <AppWrapper bg="bg-white" onBack={onBack}>
@@ -368,7 +516,7 @@ export const SettingsApp: React.FC<{ onBack: () => void }> = ({ onBack }) => (
                     <img src="https://ui-avatars.com/api/?name=CEO+Manager&background=random" className="w-full h-full" alt="User" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-medium text-slate-900">CEO Manager</h2>
+                    <h2 className="text-xl font-medium text-slate-900">YO (Dyamanto User)</h2>
                     <p className="text-xs text-slate-500">Apple ID, iCloud+, Media & Purchases</p>
                 </div>
             </div>

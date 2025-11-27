@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameState, Level } from '../types';
 import JengaBlock from './JengaBlock';
@@ -207,6 +206,7 @@ interface SimulatorProps {
     globalMorale: number;
     setGlobalStability: (val: number | ((prev: number) => number)) => void;
     setGlobalMorale: (val: number | ((prev: number) => number)) => void;
+    unlockBadge: (id: string) => void;
 }
 
 const Simulator: React.FC<SimulatorProps> = ({ 
@@ -214,7 +214,8 @@ const Simulator: React.FC<SimulatorProps> = ({
     globalStability, 
     globalMorale, 
     setGlobalStability, 
-    setGlobalMorale 
+    setGlobalMorale,
+    unlockBadge 
 }) => {
   const [levelIndex, setLevelIndex] = useState(0);
   const [gameState, setGameState] = useState<GameState>(GameState.INTRO);
@@ -243,9 +244,6 @@ const Simulator: React.FC<SimulatorProps> = ({
     return 'from-red-950 via-rose-950 to-slate-900';
   };
 
-  // CHECK GAME OVER CONDITIONS
-  // CRITICAL FIX: Only check for collapse if we are NOT currently showing feedback.
-  // This allows the user to read why they failed before the collapse animation starts.
   useEffect(() => {
     if (showFeedback || gameState === GameState.INTRO) return;
 
@@ -256,16 +254,32 @@ const Simulator: React.FC<SimulatorProps> = ({
         }
     } else if (levelIndex >= GAME_LEVELS.length && gameState !== GameState.WON) {
         setGameState(GameState.WON);
+        unlockBadge('SURVIVOR'); // Win the game
+        if (globalMorale > 80) unlockBadge('PEOPLE_FIRST');
+        if (globalStability > 80) unlockBadge('ARCHITECT');
+        if (streak > 4) unlockBadge('CONSISTENT');
     }
-  }, [globalStability, globalMorale, levelIndex, showFeedback, gameState]);
+  }, [globalStability, globalMorale, levelIndex, showFeedback, gameState, streak]);
 
   const handleChoice = (optionIndex: number) => {
     if (!currentLevel) return;
     const selected = currentLevel.options[optionIndex];
     setLastImpact({ stability: selected.stabilityImpact, morale: selected.moraleImpact });
     
-    if (selected.stabilityImpact > 0 && selected.moraleImpact > 0) setStreak(s => s + 1);
-    else setStreak(0);
+    if (selected.stabilityImpact > 0 && selected.moraleImpact > 0) {
+        setStreak(s => {
+            const newStreak = s + 1;
+            if (newStreak === 3) unlockBadge('MOMENTUM');
+            return newStreak;
+        });
+    } else {
+        setStreak(0);
+    }
+
+    // Specific Badge Logic based on Level ID and Choice
+    if (currentLevel.id === 3 && optionIndex === 1) unlockBadge('SERVANT_LEADER'); // Recortar alcance
+    if (currentLevel.id === 5 && optionIndex === 0) unlockBadge('CULTURE_GUARD'); // Despedir Rockstar
+    if (currentLevel.id === 6 && optionIndex === 1) unlockBadge('TRANSPARENCY'); // Salarios públicos
 
     setGlobalStability(prev => Math.min(100, Math.max(0, prev + selected.stabilityImpact)));
     setGlobalMorale(prev => Math.min(100, Math.max(0, prev + selected.moraleImpact)));
@@ -276,18 +290,11 @@ const Simulator: React.FC<SimulatorProps> = ({
     setShowFeedback(true);
   };
 
-  // Logic to proceed after reading feedback
   const nextLevel = () => {
     setShowFeedback(false);
     setHintUsed(false);
-    
-    // Check if player died *after* reading feedback
-    if (globalStability <= 0 || globalMorale <= 0) {
-        // The useEffect will catch this now that showFeedback is false
-        return;
-    }
+    if (globalStability <= 0 || globalMorale <= 0) return;
 
-    // Simple random event logic
     if (Math.random() > 0.8 && levelIndex < GAME_LEVELS.length - 1) {
          triggerRandomEvent();
     } else {
@@ -308,6 +315,7 @@ const Simulator: React.FC<SimulatorProps> = ({
       else setGlobalStability(s => Math.min(100, Math.max(0, s + evt.impact)));
       
       setGameState(GameState.EVENT);
+      unlockBadge('CHAOS_MANAGER');
   };
 
   const nextLevelDirect = () => {
