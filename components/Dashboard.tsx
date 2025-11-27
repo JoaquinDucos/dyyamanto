@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 const Dashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState<'lab' | 'game' | 'theory'>('lab');
@@ -153,50 +153,96 @@ const ScheinXRay = () => {
 const CoherenceGame = () => {
   const [score, setScore] = useState(0);
   const [questionIdx, setQuestionIdx] = useState(0);
-  const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
-  const QUESTIONS = [
+  const QUESTIONS = useMemo(() => [
     {
       problem: "Rumores de pasillo sobre despidos masivos.",
       solution: "Transparencia Radical (Comunicar hechos reales)",
-      trap: "Silencio Administrativo (Evitar pánico)",
+      trap: "Gestión Centralizada (Evitar pánico)",
       theory: "Seguridad Psicológica"
     },
     {
       problem: "Un Senior comete un error que cuesta 5k USD.",
       solution: "Post-Mortem sin culpa (Aprendizaje)",
-      trap: "Descuento de sueldo (Castigo)",
+      trap: "Identificación de Responsables (Accountability)",
       theory: "Mentalidad de Crecimiento vs Fija"
     },
     {
       problem: "El equipo rechaza usar una nueva herramienta impuesta.",
-      solution: "Descongelamiento (Lewin) - Dialogar primero",
-      trap: "Imposición por Autoridad (Fuerza)",
-      theory: "Gestión del Cambio"
+      solution: "Descongelamiento (Dialogar y Vender)",
+      trap: "Implementación Ágil (Fuerza por velocidad)",
+      theory: "Gestión del Cambio (Lewin)"
     },
     {
       problem: "Disputa entre dos áreas por recursos.",
       solution: "Visión Sistémica (Objetivo Común)",
-      trap: "Competencia Interna (Ganar-Perder)",
+      trap: "Optimización por Deptos. (Eficiencia Local)",
       theory: "Pensamiento Sistémico (Senge)"
     }
-  ];
+  ], []);
+
+  // Shuffle options logic (generated once per question index)
+  const currentOptions = useMemo(() => {
+    if (questionIdx >= QUESTIONS.length) return [];
+    const q = QUESTIONS[questionIdx];
+    const opts = [
+        { text: q.solution, correct: true },
+        { text: q.trap, correct: false }
+    ];
+    // Randomize simple sort
+    return Math.random() > 0.5 ? opts : opts.reverse();
+  }, [questionIdx, QUESTIONS]);
 
   const handleAnswer = (isCorrect: boolean) => {
-    setFeedback(isCorrect ? 'correct' : 'wrong');
+    if (selectedAnswer !== null) return; // Prevent double click
+
     if (isCorrect) setScore(s => s + 1);
     
+    // Slight delay to show color
     setTimeout(() => {
-        setFeedback(null);
         if (questionIdx < QUESTIONS.length - 1) {
             setQuestionIdx(q => q + 1);
+            setSelectedAnswer(null);
         } else {
-            // Reset logic could go here
-            setQuestionIdx(0); 
-            setScore(0);
+            setGameFinished(true);
         }
-    }, 1500);
+    }, 800);
   };
+
+  const getArchetype = () => {
+      if (score === 4) return { title: "ARQUITECTO CULTURAL", icon: "🏆", desc: "Entiendes que la cultura es estrategia. Tu visión es sistémica y humana.", color: "text-emerald-600" };
+      if (score >= 2) return { title: "LÍDER EN TRANSICIÓN", icon: "🌱", desc: "Tienes buenas intenciones, pero a veces caes en viejos paradigmas de control.", color: "text-yellow-600" };
+      return { title: "DINOSAURIO CORPORATIVO", icon: "🦖", desc: "Tu enfoque tradicional está asfixiando la innovación. Necesitas 'descongelar' tus creencias.", color: "text-rose-600" };
+  };
+
+  const restart = () => {
+      setScore(0);
+      setQuestionIdx(0);
+      setGameFinished(false);
+      setSelectedAnswer(null);
+  };
+
+  if (gameFinished) {
+      const arch = getArchetype();
+      return (
+          <div className="p-6 h-full flex flex-col items-center justify-center animate-slide-up text-center">
+              <div className="bg-white p-8 rounded-3xl shadow-xl border-2 border-slate-100 max-w-sm w-full">
+                  <div className="text-6xl mb-4 animate-bounce">{arch.icon}</div>
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Tu Arquetipo de Liderazgo</p>
+                  <h2 className={`text-2xl font-black mb-4 ${arch.color}`}>{arch.title}</h2>
+                  <p className="text-slate-600 text-sm mb-6 leading-relaxed">{arch.desc}</p>
+                  <div className="bg-slate-100 rounded-xl p-3 mb-6">
+                      <p className="text-slate-500 text-xs font-mono">Puntaje Final: {score}/{QUESTIONS.length}</p>
+                  </div>
+                  <button onClick={restart} className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">
+                      Intentar de Nuevo
+                  </button>
+              </div>
+          </div>
+      )
+  }
 
   const currentQ = QUESTIONS[questionIdx];
 
@@ -206,33 +252,38 @@ const CoherenceGame = () => {
         <div className="w-full max-w-sm relative">
             {/* Score Card */}
             <div className="absolute -top-12 right-0 bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                Score: {score}/{QUESTIONS.length}
+                Dilema {questionIdx + 1}/{QUESTIONS.length}
             </div>
 
             <div className="bg-white rounded-3xl shadow-xl p-8 text-center border-2 border-slate-100 relative overflow-hidden">
-                {feedback && (
-                    <div className={`absolute inset-0 flex items-center justify-center z-10 ${feedback === 'correct' ? 'bg-emerald-500' : 'bg-rose-500'}`}>
-                        <span className="text-6xl animate-pop">{feedback === 'correct' ? '✅' : '❌'}</span>
-                    </div>
-                )}
-                
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Dilema #{questionIdx + 1}</h4>
-                <div className="text-4xl mb-6">🌩️</div>
-                <h3 className="text-lg font-bold text-slate-800 mb-2">{currentQ.problem}</h3>
-                <p className="text-xs text-slate-500 mb-8">¿Cuál es la solución coherente con Dyamanto?</p>
+                <div className="text-4xl mb-6">⚡</div>
+                <h3 className="text-lg font-bold text-slate-800 mb-2 leading-tight">{currentQ.problem}</h3>
+                <p className="text-xs text-slate-500 mb-8 italic">Elige la solución culturalmente coherente</p>
 
                 <div className="space-y-3">
-                    {/* Randomize order logic simplified for demo */}
-                    <button onClick={() => handleAnswer(true)} className="w-full p-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-xl text-xs transition-colors border border-indigo-200">
-                        {currentQ.solution}
-                    </button>
-                    <button onClick={() => handleAnswer(false)} className="w-full p-4 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold rounded-xl text-xs transition-colors border border-slate-200">
-                        {currentQ.trap}
-                    </button>
+                    {currentOptions.map((opt, i) => (
+                        <button 
+                            key={i}
+                            onClick={() => {
+                                setSelectedAnswer(i);
+                                handleAnswer(opt.correct);
+                            }} 
+                            disabled={selectedAnswer !== null}
+                            className={`
+                                w-full p-4 rounded-xl text-xs font-bold border transition-all duration-200
+                                ${selectedAnswer === i 
+                                    ? (opt.correct ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-rose-500 text-white border-rose-500')
+                                    : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
+                                }
+                            `}
+                        >
+                            {opt.text}
+                        </button>
+                    ))}
                 </div>
             </div>
              <p className="text-[10px] text-center mt-6 text-slate-400">
-                Basado en: {currentQ.theory}
+                Tema: {currentQ.theory}
              </p>
         </div>
     </div>
