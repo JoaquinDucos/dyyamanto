@@ -417,13 +417,13 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const isCollapsing = gameState === GameState.COLLAPSING || gameState === GameState.LOST;
 
   return (
-    <div className={`h-full min-h-screen bg-gradient-to-br ${getBgColor()} text-white flex flex-col relative overflow-hidden font-sans transition-all duration-1000`}>
+    <div className={`h-full w-full bg-gradient-to-br ${getBgColor()} text-white flex flex-col relative overflow-hidden font-sans transition-all duration-1000`}>
       
       {/* Floating Particles */}
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
       
       {/* HUD */}
-      <div className="flex justify-between items-start p-3 z-20 glass m-2 rounded-2xl backdrop-blur-md border-b border-white/10">
+      <div className="flex justify-between items-start p-3 z-20 glass m-2 rounded-2xl backdrop-blur-md border-b border-white/10 shrink-0">
         <button onClick={onBack} className="text-xl p-2 hover:bg-white/10 rounded-full transition-colors active:scale-95">🔙</button>
         
         <div className="flex flex-col flex-1 mx-2 space-y-2">
@@ -459,11 +459,11 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       </div>
 
       {/* Main Game Area */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-4 min-h-[400px]">
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-4 overflow-hidden">
         
         {/* TOWER */}
         <div 
-            className="w-56 mb-8 transition-all duration-1000 ease-out relative perspective-1000"
+            className="w-48 sm:w-56 mb-4 transition-all duration-1000 ease-out relative perspective-1000 shrink-0"
             style={{ 
                 transform: isCollapsing ? 'none' : `rotate(${tiltAngle}deg) scale(${1 + (100-stability)*0.002})`,
                 opacity: (gameState === GameState.INTRO || gameState === GameState.EVENT) ? 0.2 : 1
@@ -482,7 +482,7 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             )}
 
             {/* Tower Base */}
-            <div className={`h-6 w-64 -ml-4 bg-slate-800 rounded-lg mb-2 shadow-2xl border-t border-slate-600 transition-opacity duration-300 ${isCollapsing ? 'opacity-0' : 'opacity-100'}`}></div>
+            <div className={`h-6 w-full -ml-[2%] bg-slate-800 rounded-lg mb-2 shadow-2xl border-t border-slate-600 transition-opacity duration-300 ${isCollapsing ? 'opacity-0' : 'opacity-100'}`}></div>
 
             <div className="flex flex-col-reverse gap-1 perspective-origin-bottom">
                 <JengaBlock type="value" label="PROPÓSITO" stability={stability} index={0} isFalling={isCollapsing} trajectory={trajectories[0]} />
@@ -497,18 +497,16 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
         </div>
 
-        {/* UI PANELS */}
-        <div className="w-full max-w-md absolute bottom-4 sm:relative sm:bottom-0">
+        {/* UI PANELS (Overlay style for mobile feel) */}
+        <div className="w-full max-w-sm absolute bottom-4 z-30">
             
             {/* INTRO */}
             {gameState === GameState.INTRO && (
-                <div className="glass p-8 rounded-3xl text-center shadow-2xl animate-slide-up bg-slate-900/60">
-                    <div className="text-7xl mb-6 drop-shadow-lg">🏛️</div>
-                    <h2 className="text-3xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">CEO Simulator</h2>
-                    <p className="text-slate-300 text-sm mb-8 leading-relaxed">
+                <div className="glass p-6 rounded-3xl text-center shadow-2xl animate-slide-up bg-slate-900/60 mx-4">
+                    <div className="text-6xl mb-4 drop-shadow-lg">🏛️</div>
+                    <h2 className="text-2xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">CEO Simulator</h2>
+                    <p className="text-slate-300 text-xs mb-6 leading-relaxed">
                         Equilibra la <strong>Estabilidad</strong> de la empresa y la <strong>Moral</strong> del equipo.
-                        <br/><br/>
-                        Si alguno llega a 0, pierdes.
                     </p>
                     <button 
                         onClick={() => setGameState(GameState.PLAYING)}
@@ -521,11 +519,11 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             {/* EVENT */}
             {gameState === GameState.EVENT && randomEvent && (
-                 <div className="glass bg-slate-800 p-8 rounded-3xl text-center shadow-2xl animate-pop border-2 border-yellow-500/50">
+                 <div className="glass bg-slate-800 p-6 rounded-3xl text-center shadow-2xl animate-pop border-2 border-yellow-500/50 mx-4">
                      <div className="text-5xl mb-4 animate-shake">⚡</div>
-                     <h3 className="text-xl font-bold text-yellow-400 mb-2">EVENTO ALEATORIO</h3>
-                     <p className="text-white text-lg mb-6">{randomEvent.text}</p>
-                     <div className="text-red-400 font-mono font-bold text-xl mb-8">
+                     <h3 className="text-lg font-bold text-yellow-400 mb-2">EVENTO ALEATORIO</h3>
+                     <p className="text-white text-base mb-6">{randomEvent.text}</p>
+                     <div className="text-red-400 font-mono font-bold text-lg mb-6">
                          Impacto: {randomEvent.impact}
                      </div>
                      <button onClick={nextLevelDirect} className="w-full bg-white/10 hover:bg-white/20 py-3 rounded-xl text-white font-bold transition-colors">
@@ -536,37 +534,37 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             {/* PLAYING - QUESTION */}
             {gameState === GameState.PLAYING && !showFeedback && currentLevel && (
-                <div className="bg-slate-800/90 backdrop-blur-md text-white p-6 rounded-3xl shadow-2xl animate-slide-up border border-white/10">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-black text-indigo-300 leading-tight">{currentLevel.title}</h3>
+                <div className="bg-slate-800/95 backdrop-blur-md text-white p-5 rounded-3xl shadow-2xl animate-slide-up border border-white/10 mx-2">
+                    <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-base font-black text-indigo-300 leading-tight">{currentLevel.title}</h3>
                         {!hintUsed && (
-                            <button onClick={useHint} className="text-xs bg-indigo-500/20 text-indigo-200 px-2 py-1 rounded border border-indigo-500/50 hover:bg-indigo-500/40 transition-colors">
+                            <button onClick={useHint} className="text-[10px] bg-indigo-500/20 text-indigo-200 px-2 py-1 rounded border border-indigo-500/50 hover:bg-indigo-500/40 transition-colors whitespace-nowrap">
                                 💡 Pista (-10 Moral)
                             </button>
                         )}
-                        {hintUsed && <span className="text-xs text-yellow-300 animate-pulse">Asesor activado</span>}
+                        {hintUsed && <span className="text-[10px] text-yellow-300 animate-pulse whitespace-nowrap">Asesor activado</span>}
                     </div>
                     
                     {hintUsed && (
-                        <div className="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-xl mb-4 text-xs text-yellow-200 italic">
+                        <div className="bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-xl mb-3 text-[10px] text-yellow-200 italic">
                              "Asesor: {currentLevel.hint}"
                         </div>
                     )}
 
-                    <p className="text-slate-300 text-sm mb-6 leading-relaxed border-l-2 border-indigo-500 pl-4">
+                    <p className="text-slate-300 text-xs mb-4 leading-relaxed border-l-2 border-indigo-500 pl-3">
                         {currentLevel.description}
                     </p>
-                    <div className="grid gap-2">
+                    <div className="grid gap-2 max-h-[220px] overflow-y-auto pr-1">
                         {currentLevel.options.map((opt, i) => (
                             <button 
                                 key={i}
                                 onClick={() => handleChoice(i)}
-                                className="text-left p-3 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-400 hover:bg-white/10 transition-all active:scale-[0.98] text-xs font-medium flex items-center group relative overflow-hidden"
+                                className="text-left p-3 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-400 hover:bg-white/10 transition-all active:scale-[0.98] text-xs font-medium flex items-center group relative overflow-hidden shrink-0"
                             >
-                                <span className="mr-3 bg-indigo-600 text-white w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-lg text-[10px] font-bold shadow-lg group-hover:scale-110 transition-transform z-10">
+                                <span className="mr-3 bg-indigo-600 text-white w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-lg text-[10px] font-bold shadow-lg group-hover:scale-110 transition-transform z-10">
                                     {String.fromCharCode(65 + i)}
                                 </span>
-                                <span className="z-10 relative">{opt.text}</span>
+                                <span className="z-10 relative leading-tight">{opt.text}</span>
                             </button>
                         ))}
                     </div>
@@ -575,21 +573,21 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             {/* PLAYING - FEEDBACK */}
             {gameState === GameState.PLAYING && showFeedback && (
-                <div className="glass bg-slate-900/90 text-white p-6 rounded-3xl shadow-2xl animate-pop border border-white/20">
-                     <div className="mb-4 flex items-center gap-3">
+                <div className="glass bg-slate-900/95 text-white p-6 rounded-3xl shadow-2xl animate-pop border border-white/20 mx-4">
+                     <div className="mb-3 flex items-center gap-3">
                         <span className="text-4xl filter drop-shadow-md">
                             {feedback.includes('Error') || feedback.includes('Colapso') || feedback.includes('Mala') || feedback.includes('Pánico') ? '❌' : '✨'}
                         </span>
                         <div className="h-px bg-white/20 flex-1"></div>
                      </div>
-                     <p className="font-bold text-lg mb-4 leading-snug">{feedback}</p>
-                     <div className="bg-indigo-900/30 p-4 rounded-xl mb-6 border border-indigo-500/20">
-                        <p className="text-[10px] text-indigo-300 font-black uppercase mb-2 tracking-widest">💡 Teoría Aplicada</p>
-                        <p className="text-sm italic text-slate-300 leading-relaxed">"{theory}"</p>
+                     <p className="font-bold text-sm mb-4 leading-snug">{feedback}</p>
+                     <div className="bg-indigo-900/30 p-3 rounded-xl mb-6 border border-indigo-500/20">
+                        <p className="text-[10px] text-indigo-300 font-black uppercase mb-1 tracking-widest">💡 Teoría Aplicada</p>
+                        <p className="text-xs italic text-slate-300 leading-relaxed">"{theory}"</p>
                      </div>
                      <button 
                         onClick={nextLevel}
-                        className="w-full bg-white text-slate-900 font-bold py-4 rounded-xl hover:bg-indigo-50 transition-colors shadow-lg active:scale-95"
+                        className="w-full bg-white text-slate-900 font-bold py-3 rounded-xl hover:bg-indigo-50 transition-colors shadow-lg active:scale-95 text-sm"
                     >
                         {levelIndex < GAME_LEVELS.length - 1 ? 'Siguiente Desafío →' : 'Ver Informe Final'}
                     </button>
@@ -598,13 +596,13 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             {/* GAME OVER */}
             {gameState === GameState.LOST && (
-                <div className="bg-rose-950/90 backdrop-blur-xl p-8 rounded-3xl text-center shadow-2xl border-2 border-rose-500 animate-slide-up z-50">
-                    <div className="text-7xl mb-4 animate-shake">🏚️</div>
-                    <h2 className="text-4xl font-black text-white mb-2 tracking-tighter">COLAPSO</h2>
-                    <p className="text-rose-200 mb-8 font-medium">
+                <div className="bg-rose-950/95 backdrop-blur-xl p-6 rounded-3xl text-center shadow-2xl border-2 border-rose-500 animate-slide-up z-50 mx-4">
+                    <div className="text-6xl mb-4 animate-shake">🏚️</div>
+                    <h2 className="text-3xl font-black text-white mb-2 tracking-tighter">COLAPSO</h2>
+                    <p className="text-rose-200 text-sm mb-6 font-medium">
                         {stability <= 0 ? "La falta de procesos sólidos derrumbó la estructura." : "El equipo renunció masivamente (Moral 0)."}
                     </p>
-                    <button onClick={restart} className="bg-rose-600 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-rose-500 transition-colors w-full uppercase tracking-widest active:scale-95">
+                    <button onClick={restart} className="bg-rose-600 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-rose-500 transition-colors w-full uppercase tracking-widest active:scale-95 text-sm">
                         Reconstruir Dyamanto
                     </button>
                 </div>
@@ -612,10 +610,10 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             {/* WIN */}
             {gameState === GameState.WON && (
-                <div className="bg-emerald-900/90 backdrop-blur-xl p-8 rounded-3xl text-center shadow-2xl border-2 border-emerald-400 animate-slide-up z-50">
-                    <div className="text-7xl mb-4 animate-bounce">💎</div>
-                    <h2 className="text-3xl font-black text-white mb-2">CULTURA DE DIAMANTE</h2>
-                    <div className="grid grid-cols-2 gap-4 text-xs bg-black/30 p-4 rounded-xl mb-8 text-center font-mono">
+                <div className="bg-emerald-900/95 backdrop-blur-xl p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400 animate-slide-up z-50 mx-4">
+                    <div className="text-6xl mb-4 animate-bounce">💎</div>
+                    <h2 className="text-2xl font-black text-white mb-2">CULTURA DE DIAMANTE</h2>
+                    <div className="grid grid-cols-2 gap-4 text-xs bg-black/30 p-4 rounded-xl mb-6 text-center font-mono">
                         <div>
                             <p className="text-slate-400">Estabilidad</p>
                             <p className="text-xl text-emerald-300 font-bold">{stability}</p>
@@ -625,7 +623,7 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             <p className="text-xl text-pink-300 font-bold">{morale}</p>
                         </div>
                     </div>
-                    <button onClick={onBack} className="bg-white text-emerald-900 px-8 py-4 rounded-full font-bold shadow-lg w-full hover:scale-105 transition-transform">
+                    <button onClick={onBack} className="bg-white text-emerald-900 px-8 py-4 rounded-full font-bold shadow-lg w-full hover:scale-105 transition-transform text-sm">
                         Volver al Hub
                     </button>
                 </div>
