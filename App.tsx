@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Landing from './components/Landing';
 import Simulator from './components/Simulator';
 import Leaks from './components/Leaks';
+import Dashboard from './components/Dashboard';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>('landing');
@@ -24,6 +25,7 @@ const App: React.FC = () => {
       {currentView === 'landing' && <Landing onNavigate={navigateTo} />}
       {currentView === 'simulator' && <Simulator onBack={() => navigateTo('landing')} />}
       {currentView === 'leaks' && <Leaks onBack={() => navigateTo('landing')} />}
+      {currentView === 'dashboard' && <Dashboard onBack={() => navigateTo('landing')} />}
     </>
   );
 

@@ -2,48 +2,89 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ChatNode, Message } from '../types';
 
-// Meme URL (Reddit)
+// Images
 const SAPEEE_IMG_URL = "https://preview.redd.it/z3nj57t6grm61.jpg?auto=webp&s=9eecb9cefdd01cd2be90c4cdc5653e300d27d37f";
 const FALLBACK_IMG_URL = "https://placehold.co/400x300/EEE/31343C?text=SAPEEE!+%F0%9F%A4%99";
+// Updated reliable Homer Gif
+const HOMER_GIF_URL = "https://media.giphy.com/media/COYGe9rZvfiaQ/giphy.gif"; 
 
 const STORY_NODES: Record<string, ChatNode> = {
   'start': {
     id: 'start',
     messages: [
-      { id: '1', role: 'dev', sender: 'Javi (Tech Lead)', text: 'Che @channel, vieron el mail de RRHH?? 😡', delay: 500 },
-      { id: 'img1', role: 'dev', sender: 'Javi (Tech Lead)', type: 'image', contentUrl: SAPEEE_IMG_URL, delay: 1500 },
-      { id: '2', role: 'dev', sender: 'Ana (Frontend)', text: 'Sí, cualquiera. Dicen que hay que loguear cada 15 minutos?? "Sapee" mis polainas.', delay: 3000 },
-      { id: '3', role: 'dev', sender: 'Javi', text: 'Esto es micromanagement puro. Si no confían en nosotros, avisen y nos vamos.', delay: 5000 },
-      { id: '4', role: 'system', sender: 'System', text: '🔔 Sofia (Product Owner) está grabando un audio...', delay: 6000 },
-      { id: 'audio1', role: 'manager', sender: 'Sofia', type: 'audio', contentUrl: '15s', delay: 8500 },
-      { id: '6', role: 'dev', sender: 'Javi', text: 'Sofi, todo bien, pero el audio no me dice nada nuevo. Esto rompe el contrato moral.', delay: 11000 },
+      { id: '1', role: 'dev', sender: 'Javi (Tech Lead)', text: 'Che @channel, vieron el mail de RRHH?? 😡', delay: 200 },
+      { id: 'img1', role: 'dev', sender: 'Javi (Tech Lead)', type: 'image', contentUrl: SAPEEE_IMG_URL, delay: 600 },
+      { id: '2', role: 'dev', sender: 'Ana (Frontend)', text: 'Sí, cualquiera. Dicen que hay que loguear cada 15 minutos?? "Sapee" mis polainas.', delay: 1200 },
+      { id: '3', role: 'dev', sender: 'Javi', text: 'Esto es micromanagement puro. Si no confían en nosotros, avisen y nos vamos.', delay: 2000 },
+      { id: '4', role: 'system', sender: 'System', text: '🔔 Sofia (Product Owner) está grabando un audio...', delay: 2500 },
+      { id: 'audio1', role: 'manager', sender: 'Sofia', type: 'audio', contentUrl: '15s', delay: 3500 },
+      { id: '6', role: 'dev', sender: 'Javi', text: 'Sofi, todo bien, pero el audio no me dice nada nuevo. Esto rompe el contrato moral.', delay: 4500 },
     ],
     options: [
       { text: 'Intervenir con autoridad: "Las normas están para cumplirse."', nextNodeId: 'authoritarian', type: 'risky' },
       { text: 'Empatizar y preguntar: "¿Qué proponen ustedes para medir?"', nextNodeId: 'empathic', type: 'safe' },
-      { text: 'Tirar un meme y relajar el ambiente.', nextNodeId: 'cool_manager', type: 'neutral' },
+      { text: 'Mandar un Sticker/Meme para relajar.', nextNodeId: 'cool_manager', type: 'neutral' },
       { text: 'Ignorar y dejar que Sofia maneje.', nextNodeId: 'ignore', type: 'neutral' }
     ]
   },
   'cool_manager': {
       id: 'cool_manager',
       messages: [
-          { id: 'cm1', role: 'hero', sender: 'Tú', type: 'image', contentUrl: 'https://media.tenor.com/2nZ20s-jR74AAAAM/drinking-homero.gif', delay: 1000 },
-          { id: 'cm2', role: 'hero', sender: 'Tú', text: 'Tranquilos. Nadie va a loguear cada 15 min mientras yo esté acá. Déjenme hablar con RRHH.', delay: 2000 },
-          { id: 'cm3', role: 'dev', sender: 'Javi', text: 'Jajaja ese gif. Dale, confiamos en vos. Pero que no se repita.', delay: 4000 },
-          { id: 'cm4', role: 'system', sender: 'System', text: 'La tensión bajó, pero ahora RRHH te tiene en la mira.', delay: 5000 }
+          { id: 'cm1', role: 'hero', sender: 'Tú', type: 'image', contentUrl: HOMER_GIF_URL, delay: 500 },
+          { id: 'cm2', role: 'hero', sender: 'Tú', text: 'Tranquilos. Nadie va a loguear cada 15 min mientras yo esté acá. Déjenme hablar con RRHH.', delay: 1500 },
+          { id: 'cm3', role: 'dev', sender: 'Javi', text: 'Jajaja ok. Te tomamos la palabra. Pero ojo.', delay: 2500 },
+      ],
+      options: [
+        { text: 'Enviar Sticker de "Puño" (Compromiso)', nextNodeId: 'sticker_commit', type: 'safe' },
+        { text: 'Cambiar de tema: Trivia Cultural.', nextNodeId: 'quiz_time', type: 'neutral' }
+      ]
+  },
+  'sticker_commit': {
+      id: 'sticker_commit',
+      messages: [
+          { id: 'sc1', role: 'hero', sender: 'Tú', type: 'sticker', contentUrl: 'https://cdn-icons-png.flaticon.com/512/742/742751.png', delay: 500 }, // Fist bump sticker
+          { id: 'sc2', role: 'dev', sender: 'Ana', text: '👊', delay: 1000 },
+          { id: 'sc3', role: 'system', sender: 'System', text: 'La tensión se disipó. Ganaste tiempo.', delay: 2000 }
       ],
       autoNext: 'win_safe'
+  },
+  'quiz_time': {
+      id: 'quiz_time',
+      messages: [
+          { id: 'qt1', role: 'hero', sender: 'Tú', text: 'Para bajar la espuma... Pregunta rápida: ¿Según qué teoría el micromanagement desmotiva a perfiles creativos?', delay: 1000 },
+          { id: 'qt2', role: 'dev', sender: 'Javi', text: 'Uff, ¿examen sorpresa? Mmm...', delay: 2000 }
+      ],
+      options: [
+          { text: 'Teoría X e Y (McGregor)', nextNodeId: 'quiz_correct', type: 'safe' },
+          { text: 'Condicionamiento Operante (Skinner)', nextNodeId: 'quiz_wrong', type: 'risky' }
+      ]
+  },
+  'quiz_correct': {
+      id: 'quiz_correct',
+      messages: [
+          { id: 'qc1', role: 'hero', sender: 'Tú', text: 'Exacto, Teoría Y. Ustedes se automotivan, no necesitan un capataz.', delay: 500 },
+          { id: 'qc2', role: 'dev', sender: 'Ana', text: '👏 Al fin alguien que leyó el manual. Bien ahí.', delay: 1500 }
+      ],
+      autoNext: 'win_legend'
+  },
+  'quiz_wrong': {
+      id: 'quiz_wrong',
+      messages: [
+          { id: 'qw1', role: 'hero', sender: 'Tú', text: 'Es Skinner, necesitan premios y castigos.', delay: 500 },
+          { id: 'qw2', role: 'dev', sender: 'Javi', text: '¿Nos estás tratando de ratas de laboratorio? 🐀', delay: 1500 },
+          { id: 'qw3', role: 'system', sender: 'System', text: 'Perdiste el respeto intelectual del equipo.', delay: 2500 }
+      ],
+      autoNext: 'lose_fired'
   },
   'authoritarian': {
     id: 'authoritarian',
     messages: [
-      { id: 'a1', role: 'hero', sender: 'Tú (Manager)', text: 'Equipo, son normas de la empresa para escalar. Necesitamos métricas. Por favor, acaten y sigan trabajando.', delay: 1000 },
-      { id: 'a2', role: 'dev', sender: 'Javi', text: 'Ah, listo. "Acaten". Pensé que éramos socios, no operarios de fábrica.', delay: 3000 },
-      { id: 'a3', role: 'dev', sender: 'Javi', text: 'Andá a c... ', delay: 4500 },
-      { id: 'del1', role: 'system', sender: 'System', text: '🚫 Este mensaje fue eliminado', delay: 4600 },
-      { id: 'a4', role: 'dev', sender: 'Ana', text: 'Uh, Javi... tranqui. @Tú, creo que no estás entendiendo el punto.', delay: 6000 },
-      { id: 'a5', role: 'manager', sender: 'Sofia', text: '@Tú, creo que eso fue muy duro. Javi está furioso.', delay: 7500 }
+      { id: 'a1', role: 'hero', sender: 'Tú (Manager)', text: 'Equipo, son normas de la empresa para escalar. Necesitamos métricas. Por favor, acaten y sigan trabajando.', delay: 500 },
+      { id: 'a2', role: 'dev', sender: 'Javi', text: 'Ah, listo. "Acaten". Pensé que éramos socios, no operarios de fábrica.', delay: 1500 },
+      { id: 'a3', role: 'dev', sender: 'Javi', text: 'Andá a c... ', delay: 2000 },
+      { id: 'del1', role: 'system', sender: 'System', text: '🚫 Este mensaje fue eliminado', delay: 2200 },
+      { id: 'a4', role: 'dev', sender: 'Ana', text: 'Uh, Javi... tranqui. @Tú, creo que no estás entendiendo el punto.', delay: 3000 },
+      { id: 'a5', role: 'manager', sender: 'Sofia', text: '@Tú, creo que eso fue muy duro. Javi está furioso.', delay: 4000 }
     ],
     options: [
       { text: 'Llamar a Javi urgente y pedir disculpas.', nextNodeId: 'redemption', type: 'safe' },
@@ -53,25 +94,36 @@ const STORY_NODES: Record<string, ChatNode> = {
   'fired_ending': {
       id: 'fired_ending',
       messages: [
-          { id: 'f1', role: 'hero', sender: 'Tú', text: 'Si no le gusta, que se vaya. Buscamos otro senior mañana.', delay: 1000 },
-          { id: 'f2', role: 'system', sender: 'System', text: '🚫 CEO se ha unido al grupo.', delay: 2000 },
-          { id: 'f3', role: 'ceo', sender: 'CEO', text: '@Tú Acabo de ver la renuncia de Javi y Ana. El cliente canceló el contrato. Pasá por mi oficina.', delay: 4000 },
-          { id: 'f4', role: 'system', sender: 'System', text: '❌ Has sido eliminado del grupo "Dyamanto Devs".', delay: 6000 }
+          { id: 'f1', role: 'hero', sender: 'Tú', text: 'Si no le gusta, que se vaya. Buscamos otro senior mañana.', delay: 500 },
+          { id: 'f2', role: 'system', sender: 'System', text: '🚫 CEO se ha unido al grupo.', delay: 1500 },
+          { id: 'f3', role: 'ceo', sender: 'CEO', text: '@Tú Acabo de ver la renuncia de Javi y Ana. El cliente canceló el contrato. Pasá por mi oficina.', delay: 3000 },
+          { id: 'f4', role: 'system', sender: 'System', text: '❌ Has sido eliminado del grupo "Dyamanto Devs".', delay: 4000 }
       ],
       autoNext: 'lose_fired'
   },
   'empathic': {
     id: 'empathic',
     messages: [
-      { id: 'e1', role: 'hero', sender: 'Tú (Manager)', text: 'Entiendo el enojo. La "Autonomía" es clave acá. ¿Qué es lo que más ruido les hace del mail concretamente?', delay: 1000 },
-      { id: 'e2', role: 'dev', sender: 'Javi', text: 'Que nos midan por tiempo y no por objetivos. Yo codeo en 2 horas lo que otros en 8. Es injusto.', delay: 3500 },
-      { id: 'e3', role: 'dev', sender: 'Ana', text: 'Exacto. Parece que quieren calentar silla. No somos un call center.', delay: 5000 },
-      { id: 'e4', role: 'manager', sender: 'Sofia', text: 'Visto así, tienen razón. ¿Y si proponemos otra forma de medir?', delay: 7000 }
+      { id: 'e1', role: 'hero', sender: 'Tú (Manager)', text: 'Entiendo el enojo. La "Autonomía" es clave acá. ¿Qué es lo que más ruido les hace del mail concretamente?', delay: 500 },
+      { id: 'e2', role: 'dev', sender: 'Javi', text: 'Que nos midan por tiempo y no por objetivos. Yo codeo en 2 horas lo que otros en 8. Es injusto.', delay: 2000 },
+      { id: 'e3', role: 'dev', sender: 'Ana', text: 'Exacto. Parece que quieren calentar silla. No somos un call center.', delay: 3000 },
+      { id: 'e4', role: 'manager', sender: 'Sofia', text: 'Visto así, tienen razón. ¿Y si proponemos otra forma de medir?', delay: 4000 }
     ],
     options: [
       { text: 'Proponer reunión de co-creación de métricas mañana.', nextNodeId: 'cocreation', type: 'safe' },
-      { text: 'Mandar audio explicando la presión de los inversores (Mantener apretado).', nextNodeId: 'record_defense', type: 'action' } 
+      { text: 'Mandar audio explicando la presión de los inversores (Mantener apretado).', nextNodeId: 'record_defense', type: 'action' },
+      { text: 'Filtrar el documento de salarios para desviar la atención.', nextNodeId: 'leak_salary', type: 'risky' }
     ]
+  },
+  'leak_salary': {
+      id: 'leak_salary',
+      messages: [
+          { id: 'ls1', role: 'hero', sender: 'Tú', type: 'text', text: 'Miren esto antes de enojarse por las métricas...', delay: 500 },
+          { id: 'ls2', role: 'hero', sender: 'Tú', text: '📄 Archivo adjunto: sueldos_2025.pdf', delay: 1000 },
+          { id: 'ls3', role: 'dev', sender: 'Javi', text: '... 😳 ¿Qué es esto? ¿Por qué el nuevo gana más que yo?', delay: 2500 },
+          { id: 'ls4', role: 'system', sender: 'System', text: 'Se desató el caos. La discusión de métricas pasó a segundo plano, pero la confianza se rompió.', delay: 4000 }
+      ],
+      autoNext: 'lose_burnout'
   },
   'record_defense': {
       id: 'record_defense',
@@ -84,10 +136,10 @@ const STORY_NODES: Record<string, ChatNode> = {
   'ignore': {
     id: 'ignore',
     messages: [
-      { id: 'i1', role: 'system', sender: 'System', text: 'Has silenciado el chat...', delay: 1000 },
-      { id: 'i2', role: 'system', sender: 'System', text: '... 2 horas después ...', delay: 3000 },
-      { id: 'i3', role: 'manager', sender: 'Sofia', text: '@Tú URGENTE. Javi pusheó un código roto a producción y apagó el teléfono. El servidor está caído.', delay: 5000 },
-      { id: 'i4', role: 'manager', sender: 'Sofia', text: 'Los clientes están llamando. Esto es un desastre. Nadie responde.', delay: 7000 }
+      { id: 'i1', role: 'system', sender: 'System', text: 'Has silenciado el chat...', delay: 500 },
+      { id: 'i2', role: 'system', sender: 'System', text: '... 2 horas después ...', delay: 1500 },
+      { id: 'i3', role: 'manager', sender: 'Sofia', text: '@Tú URGENTE. Javi pusheó un código roto a producción y apagó el teléfono. El servidor está caído.', delay: 3000 },
+      { id: 'i4', role: 'manager', sender: 'Sofia', text: 'Los clientes están llamando. Esto es un desastre. Nadie responde.', delay: 4000 }
     ],
     options: [
       { text: 'Asumir la culpa y tratar de arreglarlo solo.', nextNodeId: 'crisis_management', type: 'neutral' },
@@ -97,17 +149,17 @@ const STORY_NODES: Record<string, ChatNode> = {
   'blame_game': {
       id: 'blame_game',
       messages: [
-          { id: 'bg1', role: 'hero', sender: 'Tú', text: 'Esto fue intencional. Javi rompió todo antes de irse.', delay: 1000 },
-          { id: 'bg2', role: 'ceo', sender: 'CEO', text: 'No me importan los culpables, me importa la solución. Tu falta de liderazgo permitió esto.', delay: 3000 }
+          { id: 'bg1', role: 'hero', sender: 'Tú', text: 'Esto fue intencional. Javi rompió todo antes de irse.', delay: 500 },
+          { id: 'bg2', role: 'ceo', sender: 'CEO', text: 'No me importan los culpables, me importa la solución. Tu falta de liderazgo permitió esto.', delay: 2000 }
       ],
       autoNext: 'lose_fired'
   },
   'crisis_management': {
       id: 'crisis_management',
       messages: [
-          { id: 'cm1', role: 'hero', sender: 'Tú', text: 'Voy para la oficina. Me hago cargo. No toquen nada más.', delay: 1000 },
-          { id: 'cm2', role: 'system', sender: 'System', text: 'Lograste levantar el servidor, pero el equipo perdió la confianza en la gestión por tu ausencia previa.', delay: 3000 },
-          { id: 'cm3', role: 'dev', sender: 'Javi', text: '(3 horas después) Volví. Perdón por apagar el cel, me quemé. Vi que levantaste el server. Gracias.', delay: 5000 },
+          { id: 'cm1', role: 'hero', sender: 'Tú', text: 'Voy para la oficina. Me hago cargo. No toquen nada más.', delay: 500 },
+          { id: 'cm2', role: 'system', sender: 'System', text: 'Lograste levantar el servidor, pero el equipo perdió la confianza en la gestión por tu ausencia previa.', delay: 2000 },
+          { id: 'cm3', role: 'dev', sender: 'Javi', text: '(3 horas después) Volví. Perdón por apagar el cel, me quemé. Vi que levantaste el server. Gracias.', delay: 4000 },
       ],
       options: [
         { text: 'Aceptar disculpas y hablar de Burnout.', nextNodeId: 'win_safe', type: 'safe' },
@@ -117,11 +169,11 @@ const STORY_NODES: Record<string, ChatNode> = {
   'cocreation': {
     id: 'cocreation',
     messages: [
-      { id: 'c1', role: 'hero', sender: 'Tú', text: 'Hagamos esto: ignoren el mail por hoy. Mañana nos juntamos y definimos nosotros cómo medir el avance (Story points, entregables, etc). ¿Trato?', delay: 1000 },
-      { id: 'c2', role: 'dev', sender: 'Javi', text: '... Ok. Eso me sirve. Si nosotros definimos el "cómo", me banco el "qué".', delay: 3000 },
-      { id: 'c3', role: 'dev', sender: 'Ana', type: 'image', contentUrl: 'https://media.giphy.com/media/l0HlHFRbmaZtBRhXG/giphy.gif', delay: 5000 },
-      { id: 'c4', role: 'system', sender: 'System', text: 'CEO se ha unido al grupo.', delay: 6000 },
-      { id: 'c5', role: 'ceo', sender: 'CEO', text: 'Leí esto. Muy buen manejo @Tú. Esa es la cultura que quiero: soluciones, no quejas.', delay: 8000 }
+      { id: 'c1', role: 'hero', sender: 'Tú', text: 'Hagamos esto: ignoren el mail por hoy. Mañana nos juntamos y definimos nosotros cómo medir el avance (Story points, entregables, etc). ¿Trato?', delay: 500 },
+      { id: 'c2', role: 'dev', sender: 'Javi', text: '... Ok. Eso me sirve. Si nosotros definimos el "cómo", me banco el "qué".', delay: 2000 },
+      { id: 'c3', role: 'dev', sender: 'Ana', type: 'image', contentUrl: 'https://media.giphy.com/media/l0HlHFRbmaZtBRhXG/giphy.gif', delay: 3000 },
+      { id: 'c4', role: 'system', sender: 'System', text: 'CEO se ha unido al grupo.', delay: 4000 },
+      { id: 'c5', role: 'ceo', sender: 'CEO', text: 'Leí esto. Muy buen manejo @Tú. Esa es la cultura que quiero: soluciones, no quejas.', delay: 5000 }
     ],
     options: [], 
     autoNext: 'win_legend'
@@ -129,8 +181,8 @@ const STORY_NODES: Record<string, ChatNode> = {
   'redemption': {
       id: 'redemption',
       messages: [
-          { id: 'r1', role: 'hero', sender: 'Tú', text: '(Llamada finalizada) Ok, hablé con Javi. Vuelve. Admití que me equivoqué con el tono imperativo.', delay: 1000 },
-          { id: 'r2', role: 'dev', sender: 'Javi', text: 'Volví. Todo bien. Pero revisemos esas métricas por favor, no somos robots.', delay: 3000 }
+          { id: 'r1', role: 'hero', sender: 'Tú', text: '(Llamada finalizada) Ok, hablé con Javi. Vuelve. Admití que me equivoqué con el tono imperativo.', delay: 500 },
+          { id: 'r2', role: 'dev', sender: 'Javi', text: 'Volví. Todo bien. Pero revisemos esas métricas por favor, no somos robots.', delay: 1500 }
       ],
       autoNext: 'win_safe'
   },
@@ -166,11 +218,12 @@ const STORY_NODES: Record<string, ChatNode> = {
 
 const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
-  const [chatHistory, setChatHistory] = useState<Message[]>([]); // New persistent history
+  const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [typingSender, setTypingSender] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isFastForward, setIsFastForward] = useState(false);
   
   // Audio Recording State
   const [recordingProgress, setRecordingProgress] = useState(0);
@@ -194,8 +247,9 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     let accumulatedDelay = 0;
 
     node.messages.forEach((msg, index) => {
+      // Speed up if Fast Forward
+      const msgDelay = isFastForward ? 50 : (msg.delay || 1000);
       const typingStart = accumulatedDelay;
-      const msgDelay = msg.delay || 1000;
       accumulatedDelay += msgDelay;
 
       // Start typing indicator
@@ -221,10 +275,11 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             setShowOptions(true);
             setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
         }
-    }, accumulatedDelay + 500));
+        setIsFastForward(false); // Reset fast forward for next choice block
+    }, accumulatedDelay + (isFastForward ? 50 : 500)));
 
     return () => timeouts.forEach(clearTimeout);
-  }, [currentNodeId]);
+  }, [currentNodeId, isFastForward]);
 
   const handleOptionClick = (nextNodeId: string) => {
     setShowOptions(false);
@@ -287,8 +342,11 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Chat Area - Scrollbar Hidden but functional */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat scrollbar-hide">
+      {/* Chat Area */}
+      <div 
+        onClick={() => !showOptions && !isEnd && setIsFastForward(true)}
+        className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat scrollbar-hide cursor-pointer"
+      >
         
         {chatHistory.map((msg, index) => {
            const isMe = msg.role === 'hero';
@@ -306,65 +364,71 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
            return (
             <div key={`${msg.id}-${index}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-slide-up group relative`}>
-                <div className={`
-                  max-w-[85%] rounded-lg p-2 shadow-sm relative text-sm
-                  ${isMe ? 'bg-[#DCF8C6] rounded-tr-none' : 'bg-white rounded-tl-none'}
-                `}>
-                    {!isMe && <p className={`text-xs font-bold mb-1 ${msg.role === 'dev' ? 'text-orange-600' : 'text-purple-700'}`}>{msg.sender}</p>}
-                    
-                    {msg.type === 'image' && (
-                        <div className="mb-2 rounded-lg overflow-hidden border border-black/10 min-h-[150px] bg-slate-200">
-                            <img 
-                                src={msg.contentUrl} 
-                                alt="Meme" 
-                                className="w-full h-auto object-cover block" 
-                                style={{ minHeight: '150px' }}
-                                referrerPolicy="no-referrer"
-                                onError={(e) => {
-                                    e.currentTarget.src = FALLBACK_IMG_URL;
-                                }}
-                            />
-                        </div>
-                    )}
-                    
-                    {msg.type === 'audio' && (
-                        <div className="flex items-center gap-2 min-w-[180px] py-1">
-                            <div className="text-2xl text-slate-600">▶️</div>
-                            <div className="flex-1 h-1 bg-slate-300 rounded-full overflow-hidden">
-                                <div className="h-full w-1/3 bg-slate-500"></div>
+                {msg.type === 'sticker' ? (
+                     <div className="max-w-[120px] transition-transform hover:scale-110">
+                        <img src={msg.contentUrl} alt="Sticker" className="w-full h-auto drop-shadow-md" />
+                     </div>
+                ) : (
+                    <div className={`
+                        max-w-[85%] rounded-lg p-2 shadow-sm relative text-sm
+                        ${isMe ? 'bg-[#DCF8C6] rounded-tr-none' : 'bg-white rounded-tl-none'}
+                    `}>
+                        {!isMe && <p className={`text-xs font-bold mb-1 ${msg.role === 'dev' ? 'text-orange-600' : 'text-purple-700'}`}>{msg.sender}</p>}
+                        
+                        {msg.type === 'image' && (
+                            <div className="mb-2 rounded-lg overflow-hidden border border-black/10 min-h-[150px] bg-slate-200">
+                                <img 
+                                    src={msg.contentUrl} 
+                                    alt="Media" 
+                                    className="w-full h-auto object-cover block" 
+                                    style={{ minHeight: '150px' }}
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => {
+                                        e.currentTarget.src = FALLBACK_IMG_URL;
+                                    }}
+                                />
                             </div>
-                            <span className="text-xs text-slate-500">0:15</span>
+                        )}
+                        
+                        {msg.type === 'audio' && (
+                            <div className="flex items-center gap-2 min-w-[180px] py-1">
+                                <div className="text-2xl text-slate-600">▶️</div>
+                                <div className="flex-1 h-1 bg-slate-300 rounded-full overflow-hidden">
+                                    <div className="h-full w-1/3 bg-slate-500"></div>
+                                </div>
+                                <span className="text-xs text-slate-500">0:15</span>
+                            </div>
+                        )}
+
+                        {/* Text Message Content */}
+                        {msg.text && (
+                            <p className="leading-relaxed whitespace-pre-wrap text-black font-normal">
+                                {msg.text}
+                            </p>
+                        )}
+                        
+                        <div className="flex justify-end items-center gap-1 mt-1 select-none">
+                            <span className="text-[10px] text-gray-500">10:42 AM</span>
+                            {isMe && <span className="text-blue-500 text-[10px]">✓✓</span>}
                         </div>
-                    )}
 
-                    {/* Text Message Content */}
-                    {msg.text && (
-                        <p className="leading-relaxed whitespace-pre-wrap text-black font-normal">
-                            {msg.text}
-                        </p>
-                    )}
-                    
-                    <div className="flex justify-end items-center gap-1 mt-1 select-none">
-                        <span className="text-[10px] text-gray-500">10:42 AM</span>
-                        {isMe && <span className="text-blue-500 text-[10px]">✓✓</span>}
-                    </div>
+                        {/* Reactions Display */}
+                        {reactions[msg.id] && (
+                            <div className="absolute -bottom-3 right-2 bg-white rounded-full px-1 shadow-md text-xs border border-slate-200 z-10 scale-90">
+                                {reactions[msg.id]}
+                            </div>
+                        )}
 
-                    {/* Reactions Display */}
-                    {reactions[msg.id] && (
-                        <div className="absolute -bottom-3 right-2 bg-white rounded-full px-1 shadow-md text-xs border border-slate-200 z-10 scale-90">
-                            {reactions[msg.id]}
+                        {/* Reaction Picker (Hover) */}
+                        <div className="absolute -top-8 left-0 hidden group-hover:flex bg-white rounded-full shadow-lg p-1 gap-1 z-20 animate-pop">
+                            {['👍', '❤️', '😂', '🔥', '😡'].map(emoji => (
+                                <button key={emoji} onClick={() => toggleReaction(msg.id, emoji)} className="hover:scale-125 transition-transform text-lg">
+                                    {emoji}
+                                </button>
+                            ))}
                         </div>
-                    )}
-
-                    {/* Reaction Picker (Hover) */}
-                    <div className="absolute -top-8 left-0 hidden group-hover:flex bg-white rounded-full shadow-lg p-1 gap-1 z-20 animate-pop">
-                        {['👍', '❤️', '😂', '🔥', '😡'].map(emoji => (
-                            <button key={emoji} onClick={() => toggleReaction(msg.id, emoji)} className="hover:scale-125 transition-transform text-lg">
-                                {emoji}
-                            </button>
-                        ))}
                     </div>
-                </div>
+                )}
             </div>
           );
         })}
@@ -379,7 +443,6 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
         )}
 
-        {/* Dummy div to scroll to */}
         <div ref={scrollRef} className="h-4" />
       </div>
 
@@ -414,7 +477,6 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                      {recordingProgress < 100 ? "Mantén presionado para grabar tu defensa..." : "¡Audio grabado!"}
                  </p>
                  
-                 {/* Progress Bar */}
                  <div className="w-64 h-2 bg-slate-300 rounded-full overflow-hidden">
                      <div 
                         className={`h-full ${recordingProgress >= 100 ? 'bg-green-500' : 'bg-red-500'}`} 
@@ -449,7 +511,7 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         {!showOptions && !isEnd && (
             <div className="w-full text-center text-slate-400 text-xs italic">
-                Esperando mensajes...
+                (Toca el chat para adelantar)
             </div>
         )}
       </div>

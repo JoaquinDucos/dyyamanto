@@ -4,7 +4,7 @@ export interface Message {
   sender: string;
   role: 'dev' | 'manager' | 'system' | 'hero' | 'ceo'; 
   text?: string;
-  type?: 'text' | 'image' | 'audio';
+  type?: 'text' | 'image' | 'audio' | 'sticker'; // Added sticker
   contentUrl?: string; // For mock images or audio length
   delay: number;
 }
