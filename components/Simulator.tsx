@@ -422,19 +422,27 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       {/* Floating Particles */}
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
       
-      {/* HUD */}
+      {/* HUD & Navigation */}
       <div className="flex justify-between items-start p-3 z-20 glass m-2 rounded-2xl backdrop-blur-md border-b border-white/10 shrink-0">
-        <button onClick={onBack} className="text-xl p-2 hover:bg-white/10 rounded-full transition-colors active:scale-95">🔙</button>
         
-        <div className="flex flex-col flex-1 mx-2 space-y-2">
+        {/* IMPROVED BACK BUTTON */}
+        <button 
+            onClick={onBack} 
+            className="flex items-center justify-center w-10 h-10 bg-white/10 rounded-full hover:bg-white/20 transition-all active:scale-95 border border-white/5"
+            aria-label="Volver"
+        >
+            <span className="text-xl">🏠</span>
+        </button>
+        
+        <div className="flex flex-col flex-1 mx-3 space-y-2 mt-1">
             {/* Stability Bar */}
             <div className="flex flex-col">
                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1">
                     <span className="text-indigo-300">Estructura</span>
                     <span>{stability}%</span>
                 </div>
-                <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
-                    <div className={`h-full transition-all duration-700 ease-out ${stability > 50 ? 'bg-indigo-500' : 'bg-red-500'}`} style={{ width: `${stability}%` }}></div>
+                <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                    <div className={`h-full transition-all duration-700 ease-out ${stability > 50 ? 'bg-indigo-400' : 'bg-red-500'}`} style={{ width: `${stability}%` }}></div>
                 </div>
             </div>
             
@@ -444,8 +452,8 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <span className="text-pink-300">Moral Equipo</span>
                     <span>{morale}% {morale > 80 ? '🔥' : morale < 30 ? '😭' : '😐'}</span>
                 </div>
-                <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
-                    <div className={`h-full transition-all duration-700 ease-out ${morale > 50 ? 'bg-pink-500' : 'bg-orange-500'}`} style={{ width: `${morale}%` }}></div>
+                <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                    <div className={`h-full transition-all duration-700 ease-out ${morale > 50 ? 'bg-pink-400' : 'bg-orange-500'}`} style={{ width: `${morale}%` }}></div>
                 </div>
             </div>
         </div>
@@ -471,7 +479,7 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         >
              {/* Score Popup */}
              {showFeedback && (
-                <div className="absolute -top-20 left-1/2 -translate-x-1/2 flex gap-4 z-50 animate-pop">
+                <div className="absolute -top-20 left-1/2 -translate-x-1/2 flex gap-4 z-50 animate-pop pointer-events-none">
                     <div className={`font-black text-2xl drop-shadow-md ${lastImpact.stability >= 0 ? 'text-indigo-400' : 'text-red-500'}`}>
                         {lastImpact.stability >= 0 ? '+' : ''}{lastImpact.stability} 🏗️
                     </div>
@@ -502,7 +510,7 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             
             {/* INTRO */}
             {gameState === GameState.INTRO && (
-                <div className="glass p-6 rounded-3xl text-center shadow-2xl animate-slide-up bg-slate-900/60 mx-4">
+                <div className="glass p-6 rounded-3xl text-center shadow-2xl animate-slide-up bg-slate-900/60 mx-4 border border-white/10">
                     <div className="text-6xl mb-4 drop-shadow-lg">🏛️</div>
                     <h2 className="text-2xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">CEO Simulator</h2>
                     <p className="text-slate-300 text-xs mb-6 leading-relaxed">

@@ -7,7 +7,7 @@ const SAPEEE_IMG_URL = "https://preview.redd.it/z3nj57t6grm61.jpg?auto=webp&s=9e
 const FALLBACK_IMG_URL = "https://placehold.co/400x300/EEE/31343C?text=SAPEEE!+%F0%9F%A4%99";
 // Updated reliable Homer Gif
 const HOMER_GIF_URL = "https://media.giphy.com/media/COYGe9rZvfiaQ/giphy.gif"; 
-// Epic Handshake / Fist Bump (Predator) - Much better than a static icon
+// Epic Handshake / Predator Handshake - THE CORRECT ONE
 const FIST_BUMP_URL = "https://media.giphy.com/media/pHb82iyFTEUS4/giphy.gif";
 const VALORANT_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4eGp2c3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4/3o7527pa7qs9kCG78A/giphy.gif";
 
@@ -425,30 +425,36 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const isEnd = currentNodeId.startsWith('win') || currentNodeId.startsWith('lose');
 
   return (
-    <div className="flex flex-col h-full bg-[#ECE5DD] relative font-sans">
-      {/* WhatsApp Header */}
-      <div className="bg-[#075E54] p-3 text-white flex items-center shadow-md z-10 shrink-0">
-        <button onClick={onBack} className="mr-3 text-2xl active:opacity-50">←</button>
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mr-3 overflow-hidden">
-            <img src="https://ui-avatars.com/api/?name=Dyamanto+Devs&background=25D366&color=fff" alt="Group" />
+    <div className="flex flex-col h-full bg-[#EFE7DE] relative font-sans">
+      {/* WhatsApp Header - Modern & Clean */}
+      <div className="bg-[#008069] p-3 text-white flex items-center shadow-none z-20 shrink-0 sticky top-0">
+        <button 
+          onClick={onBack} 
+          className="mr-2 p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-colors flex items-center justify-center"
+          aria-label="Back"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mr-3 overflow-hidden border border-white/10">
+            <img src="https://ui-avatars.com/api/?name=Dyamanto+Devs&background=25D366&color=fff" alt="Group" className="w-full h-full object-cover"/>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 cursor-default">
           <h2 className="font-bold text-base leading-tight">Dyamanto Devs 💎</h2>
-          <p className="text-xs text-green-100 truncate">
+          <p className="text-xs text-green-100 truncate opacity-90">
              {isTyping ? `${typingSender} está escribiendo...` : 'Javi, Ana, Davide, Tú...'}
           </p>
         </div>
-        <div className="text-xl space-x-4">
+        <div className="text-xl space-x-3 opacity-80">
             <span>📹</span>
             <span>📞</span>
             <span>⋮</span>
         </div>
       </div>
 
-      {/* Chat Area */}
+      {/* Chat Area - Flat Design - No Shadows */}
       <div 
         onClick={() => !showOptions && !isEnd && setIsFastForward(true)}
-        className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat scrollbar-hide cursor-pointer"
+        className="flex-1 overflow-y-auto p-4 space-y-3 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-fixed cursor-pointer"
       >
         
         {chatHistory.map((msg, index) => {
@@ -458,7 +464,7 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
            if (isSystem) {
                return (
                    <div key={`${msg.id}-${index}`} className="flex justify-center my-4 animate-fade-in">
-                       <div className={`${msg.role === 'ceo' ? 'bg-amber-100 border-amber-300' : 'bg-[#E1F2FB] border-blue-100'} text-slate-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm border text-center max-w-[85%]`}>
+                       <div className={`${msg.role === 'ceo' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-[#E1F2FB] text-slate-700 border border-[#cce4f0]'} text-[11px] font-medium px-4 py-1.5 rounded-lg text-center max-w-[85%] shadow-none`}>
                            {msg.text}
                        </div>
                    </div>
@@ -468,18 +474,18 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
            return (
             <div key={`${msg.id}-${index}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-slide-up group relative`}>
                 {msg.type === 'sticker' ? (
-                     <div className="max-w-[150px] transition-transform hover:scale-110">
-                        <img src={msg.contentUrl} alt="Sticker" className="w-full h-auto drop-shadow-md rounded-lg" />
+                     <div className="max-w-[160px] transition-transform hover:scale-105 active:scale-95">
+                        <img src={msg.contentUrl} alt="Sticker" className="w-full h-auto drop-shadow-sm rounded-lg" />
                      </div>
                 ) : (
                     <div className={`
-                        max-w-[85%] rounded-lg p-2 shadow-sm relative text-sm
-                        ${isMe ? 'bg-[#DCF8C6] rounded-tr-none' : 'bg-white rounded-tl-none'}
+                        max-w-[85%] px-3 py-2 text-sm relative shadow-none border
+                        ${isMe ? 'bg-[#D9FDD3] rounded-2xl rounded-tr-sm border-[#C0EBA6] text-slate-800' : 'bg-white rounded-2xl rounded-tl-sm border-slate-100 text-slate-800'}
                     `}>
-                        {!isMe && <p className={`text-xs font-bold mb-1 ${msg.role === 'dev' ? 'text-orange-600' : 'text-purple-700'}`}>{msg.sender}</p>}
+                        {!isMe && <p className={`text-xs font-bold mb-0.5 ${msg.role === 'dev' ? 'text-orange-600' : 'text-purple-700'}`}>{msg.sender}</p>}
                         
                         {msg.type === 'image' && (
-                            <div className="mb-2 rounded-lg overflow-hidden border border-black/10 min-h-[150px] bg-slate-200">
+                            <div className="mb-2 rounded-lg overflow-hidden border border-black/5 min-h-[150px] bg-slate-100 mt-1">
                                 <img 
                                     src={msg.contentUrl} 
                                     alt="Media" 
@@ -494,38 +500,38 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         )}
                         
                         {msg.type === 'audio' && (
-                            <div className="flex items-center gap-2 min-w-[180px] py-1">
-                                <div className="text-2xl text-slate-600">▶️</div>
+                            <div className="flex items-center gap-3 min-w-[200px] py-2">
+                                <div className="text-2xl text-slate-500 cursor-pointer hover:text-slate-700 transition-colors">▶️</div>
                                 <div className="flex-1 h-1 bg-slate-300 rounded-full overflow-hidden">
                                     <div className="h-full w-1/3 bg-slate-500"></div>
                                 </div>
-                                <span className="text-xs text-slate-500">0:15</span>
+                                <span className="text-[10px] text-slate-500 font-medium">0:15</span>
                             </div>
                         )}
 
                         {/* Text Message Content */}
                         {msg.text && (
-                            <p className="leading-relaxed whitespace-pre-wrap text-black font-normal">
+                            <p className="leading-snug whitespace-pre-wrap font-normal">
                                 {msg.text}
                             </p>
                         )}
                         
-                        <div className="flex justify-end items-center gap-1 mt-1 select-none">
-                            <span className="text-[10px] text-gray-500">10:42 AM</span>
-                            {isMe && <span className="text-blue-500 text-[10px]">✓✓</span>}
+                        <div className="flex justify-end items-center gap-1 mt-1 select-none opacity-60">
+                            <span className="text-[10px]">10:42 AM</span>
+                            {isMe && <span className="text-blue-500 text-[10px] font-bold">✓✓</span>}
                         </div>
 
                         {/* Reactions Display */}
                         {reactions[msg.id] && (
-                            <div className="absolute -bottom-3 right-2 bg-white rounded-full px-1 shadow-md text-xs border border-slate-200 z-10 scale-90">
+                            <div className="absolute -bottom-2 right-4 bg-white rounded-full px-1.5 py-0.5 shadow-sm border border-slate-200 z-10 text-[10px]">
                                 {reactions[msg.id]}
                             </div>
                         )}
 
                         {/* Reaction Picker (Hover) */}
-                        <div className="absolute -top-8 left-0 hidden group-hover:flex bg-white rounded-full shadow-lg p-1 gap-1 z-20 animate-pop">
+                        <div className="absolute -top-10 left-0 hidden group-hover:flex bg-white rounded-full shadow-md p-1.5 gap-2 z-20 animate-pop border border-slate-100">
                             {['👍', '❤️', '😂', '🔥', '😡'].map(emoji => (
-                                <button key={emoji} onClick={(e) => { e.stopPropagation(); toggleReaction(msg.id, emoji); }} className="hover:scale-125 transition-transform text-lg">
+                                <button key={emoji} onClick={(e) => { e.stopPropagation(); toggleReaction(msg.id, emoji); }} className="hover:scale-125 transition-transform text-lg leading-none">
                                     {emoji}
                                 </button>
                             ))}
@@ -538,33 +544,32 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         
         {isTyping && (
              <div className="flex justify-start animate-pulse">
-                <div className="bg-white rounded-lg p-3 rounded-tl-none shadow-sm flex gap-1 items-center">
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></div>
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></div>
+                <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-none border border-slate-100 flex gap-1 items-center">
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-150"></div>
                 </div>
             </div>
         )}
 
-        <div ref={scrollRef} className="h-4" />
+        <div ref={scrollRef} className="h-6" />
       </div>
 
-      {/* Input Area / Options */}
-      <div className="bg-[#F0F0F0] p-2 flex items-center gap-2 shadow-inner shrink-0 z-20 min-h-[60px] pb-safe">
+      {/* Input Area / Options - Cleaner Look */}
+      <div className="bg-[#F0F2F5] p-3 flex flex-col items-center gap-2 shadow-none border-t border-slate-200 shrink-0 z-20 min-h-[80px] pb-safe">
         {showOptions && !isEnd && currentNode?.interactionType !== 'record_audio' && (
-             <div className="flex flex-col w-full gap-2 pb-2 px-2">
-                 <p className="text-xs text-center text-slate-500 uppercase font-bold tracking-widest mb-1">Tu decisión</p>
+             <div className="flex flex-col w-full gap-2 pb-1">
                  {currentNode?.options?.map((opt, idx) => (
                      <button
                         key={idx}
                         onClick={() => handleOptionClick(opt.nextNodeId)}
                         className={`
-                            w-full py-3 px-4 rounded-xl font-medium text-sm shadow-sm transition-all active:scale-95
-                            bg-white text-black border border-slate-200 hover:bg-slate-50
-                            text-left flex items-center
+                            w-full py-3.5 px-5 rounded-full font-medium text-sm shadow-sm transition-all active:scale-95
+                            bg-white text-slate-800 border border-slate-200 hover:bg-slate-50
+                            text-left flex items-center group
                         `}
                      >
-                         <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mr-3 text-xs font-bold shrink-0">
+                         <span className="w-6 h-6 rounded-full bg-slate-100 text-indigo-600 flex items-center justify-center mr-3 text-xs font-bold shrink-0 group-hover:bg-indigo-100 transition-colors">
                             {idx + 1}
                          </span>
                          {opt.text}
@@ -575,12 +580,12 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         {/* Record Audio Interaction */}
         {showOptions && currentNode?.interactionType === 'record_audio' && (
-            <div className="w-full flex flex-col items-center justify-center py-4 gap-4">
-                 <p className="text-sm font-bold text-slate-600">
-                     {recordingProgress < 100 ? "Mantén presionado para grabar tu defensa..." : "¡Audio grabado!"}
+            <div className="w-full flex flex-col items-center justify-center py-2 gap-4">
+                 <p className="text-sm font-bold text-slate-600 animate-pulse">
+                     {recordingProgress < 100 ? "Mantén presionado para grabar..." : "¡Audio listo!"}
                  </p>
                  
-                 <div className="w-64 h-2 bg-slate-300 rounded-full overflow-hidden">
+                 <div className="w-full max-w-[200px] h-1.5 bg-slate-300 rounded-full overflow-hidden">
                      <div 
                         className={`h-full ${recordingProgress >= 100 ? 'bg-green-500' : 'bg-red-500'}`} 
                         style={{ width: `${recordingProgress}%` }}
@@ -593,8 +598,8 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     onTouchStart={startRecording}
                     onTouchEnd={() => stopRecording(currentNode.options![0].nextNodeId)}
                     className={`
-                        w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl transition-all
-                        ${isRecording ? 'scale-110 bg-red-600 ring-4 ring-red-300' : 'bg-[#00a884] hover:brightness-110'}
+                        w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg transition-all
+                        ${isRecording ? 'scale-110 bg-red-600 ring-4 ring-red-200' : 'bg-[#00a884] hover:brightness-110 active:scale-95'}
                         ${recordingProgress >= 100 ? 'bg-blue-500 scale-100' : 'text-white'}
                     `}
                  >
@@ -606,15 +611,15 @@ const Leaks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         {isEnd && (
             <button 
                 onClick={onBack}
-                className="w-full bg-slate-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors shadow-lg"
+                className="w-full bg-[#008069] text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-md active:scale-95"
             >
                 Volver al Hub
             </button>
         )}
 
         {!showOptions && !isEnd && (
-            <div className="w-full text-center text-slate-400 text-xs italic">
-                (Toca el chat para adelantar)
+            <div className="w-full text-center text-slate-400 text-[10px] uppercase tracking-widest opacity-60 mt-1">
+                Toca para adelantar
             </div>
         )}
       </div>
