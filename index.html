@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Dyamanto | Comportamiento Organizacional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,6 +17,9 @@
                 light: '#e0e7ff',
                 accent: '#f43f5e'
               }
+            },
+            spacing: {
+                'safe': 'env(safe-area-inset-bottom)',
             },
             animation: {
               'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
@@ -84,9 +88,14 @@
       /* Phone Frame for Desktop */
       .phone-frame {
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        border: 8px solid #333;
         border-radius: 40px;
-        overflow: hidden;
+      }
+      /* Safe Area Utilities */
+      .pb-safe {
+          padding-bottom: env(safe-area-inset-bottom);
+      }
+      .pt-safe {
+          padding-top: env(safe-area-inset-top);
       }
     </style>
   <script type="importmap">

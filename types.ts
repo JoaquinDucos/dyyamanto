@@ -7,6 +7,7 @@ export interface Message {
   type?: 'text' | 'image' | 'audio' | 'sticker'; // Added sticker
   contentUrl?: string; // For mock images or audio length
   delay: number;
+  triggerReaction?: { targetId: string; emoji: string }; // NEW: Bots can react to previous messages
 }
 
 export interface ChatNode {
@@ -20,6 +21,8 @@ export interface ChatNode {
   interactionType?: 'choice' | 'record_audio' | 'reaction'; // New interaction types
   nextDelay?: number;
   autoNext?: string;
+  timeout?: number; // NEW: Time limit in seconds for QTE decisions
+  timeoutNextNodeId?: string; // NEW: Where to go if time runs out
 }
 
 export interface Level {

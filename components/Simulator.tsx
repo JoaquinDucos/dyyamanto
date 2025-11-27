@@ -423,7 +423,7 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
       
       {/* HUD & Navigation */}
-      <div className="flex justify-between items-start p-3 z-20 glass m-2 rounded-2xl backdrop-blur-md border-b border-white/10 shrink-0">
+      <div className="flex justify-between items-start p-3 pt-safe z-20 glass m-2 rounded-2xl backdrop-blur-md border-b border-white/10 shrink-0">
         
         {/* IMPROVED BACK BUTTON */}
         <button 
@@ -434,11 +434,11 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <span className="text-xl">🏠</span>
         </button>
         
-        <div className="flex flex-col flex-1 mx-3 space-y-2 mt-1">
+        <div className="flex flex-col flex-1 mx-3 space-y-2 mt-1 min-w-0">
             {/* Stability Bar */}
             <div className="flex flex-col">
                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1">
-                    <span className="text-indigo-300">Estructura</span>
+                    <span className="text-indigo-300 truncate mr-2">Estructura</span>
                     <span>{stability}%</span>
                 </div>
                 <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
@@ -449,7 +449,7 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             {/* Morale Bar */}
             <div className="flex flex-col">
                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-1">
-                    <span className="text-pink-300">Moral Equipo</span>
+                    <span className="text-pink-300 truncate mr-2">Moral</span>
                     <span>{morale}% {morale > 80 ? '🔥' : morale < 30 ? '😭' : '😐'}</span>
                 </div>
                 <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
@@ -458,18 +458,18 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
         </div>
 
-        <div className="flex flex-col gap-1 items-end">
-             <div className="text-xs font-black bg-white/10 px-3 py-1 rounded-lg border border-white/10 shadow-inner">
+        <div className="flex flex-col gap-1 items-end shrink-0">
+             <div className="text-xs font-black bg-white/10 px-3 py-1 rounded-lg border border-white/10 shadow-inner whitespace-nowrap">
                 {Math.min(levelIndex + 1, GAME_LEVELS.length)}/10
             </div>
-            {streak > 2 && <div className="text-[10px] text-yellow-300 font-bold animate-pulse">Streak x{streak}!</div>}
+            {streak > 2 && <div className="text-[10px] text-yellow-300 font-bold animate-pulse whitespace-nowrap">Streak x{streak}!</div>}
         </div>
       </div>
 
-      {/* Main Game Area */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-4 overflow-hidden">
+      {/* Main Game Area - Flex & Centered for Responsiveness */}
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10 p-4 pb-32 overflow-hidden min-h-0">
         
-        {/* TOWER */}
+        {/* TOWER - SCALED FOR MOBILE */}
         <div 
             className="w-48 sm:w-56 mb-4 transition-all duration-1000 ease-out relative perspective-1000 shrink-0"
             style={{ 
@@ -505,8 +505,8 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
         </div>
 
-        {/* UI PANELS (Overlay style for mobile feel) */}
-        <div className="w-full max-w-sm absolute bottom-4 z-30">
+        {/* UI PANELS (Absolute positioning to overlay tower on small screens) */}
+        <div className="w-full max-w-sm absolute bottom-4 z-30 pb-safe">
             
             {/* INTRO */}
             {gameState === GameState.INTRO && (
@@ -562,7 +562,7 @@ const Simulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <p className="text-slate-300 text-xs mb-4 leading-relaxed border-l-2 border-indigo-500 pl-3">
                         {currentLevel.description}
                     </p>
-                    <div className="grid gap-2 max-h-[220px] overflow-y-auto pr-1">
+                    <div className="grid gap-2 max-h-[30vh] overflow-y-auto pr-1">
                         {currentLevel.options.map((opt, i) => (
                             <button 
                                 key={i}
