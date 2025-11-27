@@ -12,12 +12,12 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ title, subtitle, avatarUrl, onBack, onInfo }) => {
   return (
     <div 
-        className="bg-[#008069] px-2 pb-3 pt-safe text-white flex items-center shadow-md z-30 shrink-0 sticky top-0 w-full"
+        className="bg-[#008069] px-3 pb-3 pt-safe text-white flex items-center shadow-md z-30 shrink-0 sticky top-0 w-full backdrop-blur-md bg-opacity-95"
         onClick={onInfo}
       >
         <button 
             onClick={(e) => { e.stopPropagation(); onBack(); }} 
-            className="p-1 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors active:scale-95 w-10 h-10 ml-1"
+            className="p-1 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors active:scale-95 w-10 h-10 -ml-1"
             aria-label="Back"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
@@ -36,7 +36,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ title, subtitle, avatarUrl, onB
           </p>
         </div>
 
-        <div className="flex items-center gap-2 mr-1">
+        <div className="flex items-center gap-1">
              <button className="p-2 hover:bg-white/10 rounded-full transition-colors w-10 h-10 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15.6 11.6L22 7v10l-6.4-4.5v-1z"/><rect x="2" y="5" width="14" height="14" rx="2" ry="2"/></svg>
              </button>

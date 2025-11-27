@@ -7,7 +7,7 @@ import ChatHeader from './ChatHeader';
 // Assets
 const SAPEEE_IMG_URL = "https://preview.redd.it/z3nj57t6grm61.jpg?auto=webp&s=9eecb9cefdd01cd2be90c4cdc5653e300d27d37f";
 const HOMER_GIF_URL = "https://media.giphy.com/media/COYGe9rZvfiaQ/giphy.gif"; 
-const FIST_BUMP_URL = "https://media1.tenor.com/m/2s_01Z0e1MQAAAAC/arnold-schwarzenegger-predator.gif";
+const FIST_BUMP_URL = "https://media.giphy.com/media/Ke3CM1NVkULWo/giphy.gif"; // Reliable GIF URL
 const VALORANT_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ4eGp2c3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4Z3B4/3o7527pa7qs9kCG78A/giphy.gif";
 
 // Story Data
@@ -47,7 +47,7 @@ const STORY_NODES: Record<string, ChatNode> = {
       messages: [
           { id: 'sc1', role: 'hero', sender: 'Tú', type: 'sticker', contentUrl: FIST_BUMP_URL, delay: 500 }, 
           { id: 'sc2', role: 'dev', sender: 'Javi', text: 'Dillon! You son of a b****! 🦾', delay: 1500, triggerReaction: { targetId: 'sc1', emoji: '🔥' } },
-          { id: 'sc3', role: 'dev', sender: 'Ana', text: 'Bueno, ya que estamos de buenas...', delay: 2500 }
+          { id: 'sc3', role: 'dev', sender: 'Ana', text: 'Bueno, suficiente. A trabajar que el backlog no espera.', delay: 3000 }
       ],
       autoNext: 'gaming_proposal' 
   },
@@ -96,10 +96,11 @@ const STORY_NODES: Record<string, ChatNode> = {
   'gaming_proposal': {
       id: 'gaming_proposal',
       messages: [
-          { id: 'gp0', role: 'system', sender: 'System', text: '--- 2 Horas Después ---', delay: 500 },
-          { id: 'gp1', role: 'dev', sender: 'Javi', text: 'Che, @Tú, ya que salvamos el día y estamos productivos...', delay: 1500 },
-          { id: 'gp2', role: 'dev', sender: 'Javi', text: '¿Sale un Valorant rapidito? Es "Team Building" 😉', delay: 2500 },
-          { id: 'gp3', role: 'dev', sender: 'Ana', text: 'Javi, son las 3 de la tarde. Sofi nos mata.', delay: 3500 }
+          { id: 'sys_focus', role: 'system', sender: 'System', text: '🔔 Focus Mode Activado durante 2 horas...', delay: 1000 },
+          { id: 'gp0', role: 'system', sender: 'System', text: '--- 2 Horas Después ---', delay: 2500 },
+          { id: 'gp1', role: 'dev', sender: 'Javi', text: 'Che, @Tú, ya que salvamos el día y estamos productivos...', delay: 3500 },
+          { id: 'gp2', role: 'dev', sender: 'Javi', text: '¿Sale un Valorant rapidito? Es "Team Building" 😉', delay: 4500 },
+          { id: 'gp3', role: 'dev', sender: 'Ana', text: 'Javi, son las 3 de la tarde. Sofi nos mata.', delay: 5500 }
       ],
       options: [
           { text: '🎮 Sumarse: "¡Soy main Jett! Una sola."', nextNodeId: 'gaming_accepted', type: 'risky' },

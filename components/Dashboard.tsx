@@ -1,41 +1,29 @@
 
 import React, { useState, useMemo } from 'react';
+import { AppWrapper, AppHeader } from './OSApps';
 
 const Dashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState<'lab' | 'game' | 'theory'>('lab');
 
   return (
-    <div className="h-full bg-slate-50 flex flex-col font-sans relative overflow-hidden">
-      {/* Header - Clean */}
-      <div className="bg-white border-b border-slate-200 p-3 flex items-center justify-between shrink-0 z-20 shadow-sm">
-        <button 
-            onClick={onBack} 
-            className="flex items-center justify-center w-10 h-10 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors active:scale-95"
-            aria-label="Volver"
-        >
-          <span className="text-xl">🏠</span>
-        </button>
-        <div className="text-center">
-          <h2 className="font-black text-base text-indigo-900 tracking-tight">DYAMANTO LAB</h2>
-          <p className="text-[10px] text-indigo-500 font-bold uppercase tracking-widest">Centro de Investigación</p>
-        </div>
-        <div className="w-10"></div> {/* Spacer for balance */}
-      </div>
+    <AppWrapper onBack={onBack} bg="bg-slate-50">
+      {/* Header - Consistent with OS Apps */}
+      <AppHeader title="Data Lab" onBack={onBack} />
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto pb-24 relative bg-slate-50/50">
+      <div className="flex-1 overflow-y-auto pb-24 relative">
         {activeTab === 'lab' && <ScheinXRay />}
         {activeTab === 'game' && <CoherenceGame />}
         {activeTab === 'theory' && <TheoryDatabase />}
       </div>
 
       {/* Bottom Navigation - Modern */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-2 pb-safe flex justify-around items-center z-30 shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
+      <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 p-2 pb-safe flex justify-around items-center z-30 shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
         <NavBtn label="Rayos X" icon="🩻" active={activeTab === 'lab'} onClick={() => setActiveTab('lab')} />
         <NavBtn label="Protocolo" icon="🧩" active={activeTab === 'game'} onClick={() => setActiveTab('game')} />
         <NavBtn label="Teoría" icon="📚" active={activeTab === 'theory'} onClick={() => setActiveTab('theory')} />
       </div>
-    </div>
+    </AppWrapper>
   );
 };
 

@@ -51,7 +51,7 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
   // --- INTRO STATE ---
   if (gameState === GameState.INTRO) {
     return (
-      <div className="glass p-8 rounded-[2rem] text-center shadow-2xl animate-slide-up bg-slate-900/40 w-full max-w-sm backdrop-blur-xl border border-white/10">
+      <div className="glass bg-slate-900/60 p-8 rounded-[2rem] text-center shadow-2xl animate-slide-up w-full max-w-sm backdrop-blur-xl border border-white/10">
         <div className="text-7xl mb-6 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] transform hover:scale-110 transition-transform cursor-default">🏛️</div>
         <h2 className="text-3xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-purple-200 tracking-tight">
           CEO Simulator
@@ -134,53 +134,55 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
   if (gameState === GameState.PLAYING && showFeedback) {
       const isBad = feedback.includes('Error') || feedback.includes('Colapso') || feedback.includes('Mala') || feedback.includes('Pánico');
       return (
-        <div className="glass bg-slate-900/95 text-white p-6 rounded-[2rem] shadow-2xl animate-pop border border-white/20 w-full max-w-sm backdrop-blur-2xl">
+        <div className="glass bg-slate-900/90 text-white p-5 rounded-[2rem] shadow-2xl animate-pop border border-white/10 w-full max-w-sm backdrop-blur-xl overflow-hidden flex flex-col max-h-[70vh]">
              
              {/* Score Header */}
-             <div className="flex justify-center gap-8 mb-6 bg-black/20 p-3 rounded-2xl border border-white/5">
+             <div className="flex justify-center gap-8 mb-4 bg-black/30 p-2 rounded-xl border border-white/5 shrink-0">
                 <div className={`flex flex-col items-center animate-slide-up ${lastImpact.stability >= 0 ? 'text-indigo-400' : 'text-red-400'}`}>
-                    <span className="text-2xl font-black tracking-tighter">{lastImpact.stability > 0 ? '+' : ''}{lastImpact.stability}</span>
+                    <span className="text-xl font-black tracking-tighter">{lastImpact.stability > 0 ? '+' : ''}{lastImpact.stability}</span>
                     <span className="text-[9px] uppercase font-bold opacity-60 tracking-wider">Estabilidad</span>
                 </div>
                 <div className="w-px bg-white/10 h-full"></div>
                 <div className={`flex flex-col items-center animate-slide-up ${lastImpact.morale >= 0 ? 'text-pink-400' : 'text-orange-400'}`} style={{animationDelay: '100ms'}}>
-                    <span className="text-2xl font-black tracking-tighter">{lastImpact.morale > 0 ? '+' : ''}{lastImpact.morale}</span>
+                    <span className="text-xl font-black tracking-tighter">{lastImpact.morale > 0 ? '+' : ''}{lastImpact.morale}</span>
                     <span className="text-[9px] uppercase font-bold opacity-60 tracking-wider">Moral</span>
                 </div>
              </div>
 
-             {/* Outcome Text */}
-             <div className="mb-4 flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/5">
-                <span className="text-2xl shrink-0 mt-0.5 filter drop-shadow-lg">{isBad ? '❌' : '✅'}</span>
-                <p className="font-bold text-sm leading-snug text-slate-100 pt-1">{feedback}</p>
-             </div>
+             <div className="flex-1 overflow-y-auto pr-1">
+                 {/* Outcome Text */}
+                 <div className="mb-4 flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
+                    <span className="text-xl shrink-0 mt-0.5 filter drop-shadow-lg">{isBad ? '❌' : '✅'}</span>
+                    <p className="font-bold text-sm leading-snug text-slate-100 pt-1">{feedback}</p>
+                 </div>
 
-             {/* Theory Deep Dive */}
-             <div className="bg-indigo-950/60 p-5 rounded-2xl mb-6 border border-indigo-500/30 relative overflow-hidden group">
-                <div className="absolute -right-4 -top-4 text-6xl opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-500">🎓</div>
-                
-                <div className="relative z-10">
-                    <p className="text-[9px] text-indigo-300 font-black uppercase mb-1 tracking-widest flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span>
-                        Teoría Aplicada
-                    </p>
-                    <p className="text-sm font-bold text-white mb-2">"{theory}"</p>
+                 {/* Theory Deep Dive */}
+                 <div className="bg-indigo-950/60 p-4 rounded-xl mb-4 border border-indigo-500/30 relative overflow-hidden group">
+                    <div className="absolute -right-4 -top-4 text-6xl opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-500">🎓</div>
                     
-                    {/* The "Why" Section */}
-                    {theoryWhy && (
-                        <div className="pt-2 mt-2 border-t border-indigo-500/20">
-                             <p className="text-[11px] text-indigo-200 leading-relaxed font-medium">
-                                <span className="text-indigo-400 font-bold uppercase text-[9px] mr-1">Por qué:</span>
-                                {theoryWhy}
-                             </p>
-                        </div>
-                    )}
-                </div>
+                    <div className="relative z-10">
+                        <p className="text-[9px] text-indigo-300 font-black uppercase mb-1 tracking-widest flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span>
+                            Teoría Aplicada
+                        </p>
+                        <p className="text-sm font-bold text-white mb-2 leading-tight">"{theory}"</p>
+                        
+                        {/* The "Why" Section */}
+                        {theoryWhy && (
+                            <div className="mt-2 pt-2 border-t border-indigo-500/20">
+                                 <p className="text-[11px] text-indigo-100 leading-relaxed">
+                                    <span className="text-indigo-400 font-bold uppercase text-[9px] mr-1 block mb-0.5">Análisis:</span>
+                                    {theoryWhy}
+                                 </p>
+                            </div>
+                        )}
+                    </div>
+                 </div>
              </div>
 
              <button 
                 onClick={onNext}
-                className="w-full bg-white text-slate-900 font-black py-4 rounded-2xl hover:bg-indigo-50 transition-all shadow-lg active:scale-95 text-sm uppercase tracking-wide"
+                className="w-full bg-white text-slate-900 font-black py-3.5 rounded-xl hover:bg-indigo-50 transition-all shadow-lg active:scale-95 text-sm uppercase tracking-wide shrink-0 mt-2"
             >
                 Continuar
             </button>
@@ -191,7 +193,7 @@ const SimulatorCard: React.FC<SimulatorCardProps> = ({
   // --- PLAYING: QUESTION ---
   if (gameState === GameState.PLAYING && currentLevel) {
       return (
-        <div className="bg-slate-800/90 backdrop-blur-2xl text-white p-6 rounded-[2rem] shadow-2xl animate-slide-up border border-white/10 w-full max-w-md flex flex-col">
+        <div className="glass bg-slate-800/80 backdrop-blur-xl text-white p-6 rounded-[2rem] shadow-2xl animate-slide-up border border-white/10 w-full max-w-md flex flex-col">
             
             {/* Header */}
             <div className="flex items-center justify-between mb-4 shrink-0">
